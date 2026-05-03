@@ -1,0 +1,13 @@
+내가 할 수 있는 준비는 끝(.gitignore, .nojekyll 추가됨).
+
+웹에 올리는 버튼은 깃허브 로그인이 필요해서 본인만 가능합니다.
+
+[1] GitHub Desktop → Push origin 한 번 누르기
+
+[2] 브라우저 kimhub.com 아니고 github.com → whee-studio 저장소
+    Settings → Pages → Branch: main, 폴더: / (root) → Save
+
+[3] 2~5분 뒤 주소 열기 (예시)
+    https://wjdgofkd05.github.io/whee-studio/
+
+시안 2개: 위 주소 들어가면 index에서 링크로 들어가면 됩니다.
