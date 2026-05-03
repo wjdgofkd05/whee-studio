@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Whee Studio — 시안 2 · Editorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #ffffff;
+      --ink: #111111;
+      --muted: #444444;
+      --caption-meta: #8a8a8a;
+      --cap-size: 0.95rem;
+      --caption-meta-size: 0.78rem;
+      --rule: #e8e8e8;
+      --max: 1180px;
+      --chapter-year-size: clamp(2rem, 5vw, 3rem);
+      --chapter-pad-top: 3.5rem;
+      --chapter-pad-x: 1.5rem;
+      --chapter-col-gap: clamp(1.1rem, 3vw, 2rem);
+      /* 가로 스티키 GNB 아래에 연도 라벨 붙이기 (브랜드 제거 후 헤더 높이 반영) */
+      --topbar-sticky-offset: clamp(3.25rem, 9vh, 4.75rem);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    .layout__main {
+      min-width: 0;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a:hover { text-decoration-thickness: 1.5px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid #000000;
+      backdrop-filter: blur(10px);
+    }
+    .topbar__inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0.85rem var(--chapter-pad-x) 0.85rem;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.75rem 1rem;
+      box-sizing: border-box;
+    }
+    /* 네비 링크와 동일 · 작게 한 줄 */
+    .topbar__logo {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.25;
+      text-transform: lowercase;
+      white-space: nowrap;
+      color: #000000;
+      text-decoration: none;
+      flex-shrink: 0;
+      opacity: 1;
+      order: 0;
+    }
+    .topbar__logo:hover {
+      text-decoration: none;
+      opacity: 1;
+    }
+    .topbar__trailing {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.65rem;
+      margin-left: auto;
+      flex-shrink: 0;
+      order: 1;
+    }
+    .topbar__menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: #000000;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-sizing: content-box;
+    }
+    .topbar__menu-toggle:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+    .topbar__burger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+    }
+    .topbar__burger-line {
+      display: block;
+      height: 2px;
+      width: 100%;
+      background: #000000;
+      border-radius: 0;
+    }
+    .nav {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem 1.15rem;
+      font-size: var(--cap-size);
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: lowercase;
+      flex: 1;
+      min-width: 0;
+      order: 2;
+    }
+    .nav a {
+      color: #000000;
+      text-decoration: none;
+      font-weight: 400;
+      text-shadow: none;
+      white-space: nowrap;
+    }
+    /* 숨은 볼드 레이아웃: 폭은 항상 700 기준으로 잡아 호버 시 옆 링크가 덜 움직임 */
+    .nav a::before {
+      content: attr(data-nav-label);
+      display: block;
+      font-weight: 700;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .nav a:hover,
+    .nav a:focus-visible {
+      text-decoration: none;
+      font-weight: 700;
+      text-shadow: none;
+    }
+    .topbar__ig {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      color: #000000;
+      opacity: 1;
+      flex-shrink: 0;
+    }
+    .topbar__ig:hover {
+      text-decoration: none;
+      opacity: 0.55;
+    }
+    .topbar__ig svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    @media (max-width: 767px) {
+      .topbar__inner {
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .topbar__menu-toggle {
+        display: inline-flex;
+      }
+      .topbar__logo {
+        order: 0;
+      }
+      .topbar__trailing {
+        order: 1;
+        margin-left: auto;
+        flex-direction: row-reverse;
+      }
+      .nav {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        flex: 1 0 100%;
+        width: 100%;
+        order: 2;
+        padding-top: 0.65rem;
+        margin-top: 0.35rem;
+        border-top: 1px solid #000000;
+        gap: 0.55rem 0;
+      }
+      .topbar.is-nav-open .nav {
+        display: flex;
+      }
+      .nav a {
+        display: block;
+        padding: 0.35rem 0;
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .topbar__inner {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 1rem 1.5rem;
+      }
+      .topbar__menu-toggle {
+        display: none !important;
+      }
+      .topbar__logo {
+        order: 0;
+      }
+      .nav {
+        display: flex !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        flex: 1;
+        order: 1;
+        padding-top: 0;
+        margin-top: 0;
+        border-top: none;
+      }
+      .topbar__trailing {
+        order: 2;
+        margin-left: 0;
+      }
+      .topbar.is-nav-open .nav {
+        display: flex !important;
+      }
+    }
+
+    .chapter {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: var(--chapter-pad-top) var(--chapter-pad-x) 1rem;
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      .chapter {
+        /* 소개 카피·연도 열 너비 통일 (첫 챕터와 이후 연도 세로 정렬) */
+        grid-template-columns: minmax(168px, 260px) minmax(0, 1fr);
+        align-items: stretch;
+        column-gap: var(--chapter-col-gap);
+        row-gap: 1.5rem;
+      }
+    }
+    .chapter.chapter--note,
+    .chapter.chapter--cv-block {
+      padding-top: calc(var(--chapter-pad-top) + clamp(0.85rem, 2.5vw, 1.75rem));
+    }
+    /* 첫 챕터: 소개는 전체 폭 행 → 이미지 열과 겹치지 않음 */
+    .chapter__intro-band {
+      grid-column: 1 / -1;
+      max-width: min(36rem, 100%);
+      margin-bottom: 0.25rem;
+    }
+    /* 왼쪽 열: 그리드 stretch로 오른쪽 작품 열과 같은 행 높이 → .chapter__year 스티키 구간 확보 */
+    .chapter__year-rail {
+      display: block;
+      min-width: 0;
+    }
+    /* 연도(.chapter__year)와 동일 타이포 · 소문자 한 줄 */
+    .chapter__site-title {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: var(--chapter-year-size);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 0.95;
+      text-transform: lowercase;
+      white-space: nowrap;
+      color: var(--ink);
+      max-width: 100%;
+      cursor: default;
+      user-select: text;
+    }
+    /* CV 본문(.cv-card li)과 동일 타이포 */
+    .chapter__intro-bio {
+      margin: 0;
+      margin-top: 0.65rem;
+      font-size: var(--cap-size);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .chapter__intro-mail {
+      margin: 0;
+      margin-top: 0.15rem;
+    }
+    .chapter__mail-btn {
+      font: inherit;
+      font-size: var(--cap-size);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.55;
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+    }
+    .chapter__mail-btn:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .chapter > div:not(.chapter__year) {
+      min-width: 0;
+    }
+    .chapter__year {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: var(--chapter-year-size);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 0.95;
+      position: sticky;
+      top: var(--topbar-sticky-offset);
+      z-index: 2;
+      color: var(--ink);
+      background: var(--paper);
+      padding-bottom: 0.35rem;
+      padding-right: 0.35rem;
+      max-width: 100%;
+    }
+    .mag-grid {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 640px) {
+      .mag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    .mag-grid--spaced { margin-top: 1rem; }
+
+    figure.mag {
+      margin: 0;
+      cursor: pointer;
+    }
+    figure.mag:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 4px;
+    }
+
+    /* 작품 라이트박스 (시안 1과 동일 패턴) */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 4.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    .lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lightbox__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      cursor: pointer;
+    }
+    .lightbox__inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: min(92vw, 1100px);
+      max-height: calc(100vh - 6rem);
+      pointer-events: none;
+    }
+    .lightbox__inner img {
+      pointer-events: auto;
+      max-width: 100%;
+      max-height: calc(100vh - 11rem);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .lightbox__caption {
+      margin-top: 1.25rem;
+      text-align: center;
+      max-width: 36rem;
+      pointer-events: none;
+    }
+    .lightbox__caption .title {
+      display: block;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+    .lightbox__caption .meta-line {
+      display: block;
+      font-size: var(--caption-meta-size);
+      font-weight: 500;
+      color: var(--caption-meta);
+    }
+    .lightbox__btn {
+      pointer-events: auto;
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border: 1px solid #000000;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      color: #000000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .lightbox__btn:hover {
+      background: #ffffff;
+      border-color: #000000;
+      color: #000000;
+    }
+    .lightbox__btn:focus-visible {
+      outline: 2px solid #000000;
+      outline-offset: 2px;
+    }
+    .lightbox__prev { left: max(1rem, env(safe-area-inset-left)); }
+    .lightbox__next { right: max(1rem, env(safe-area-inset-right)); }
+    .lightbox__btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    body.lightbox-open {
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .lightbox {
+        padding: 3.5rem 0.75rem;
+      }
+      .lightbox__btn {
+        width: 38px;
+        height: 38px;
+      }
+      .lightbox__prev { left: 0.35rem; }
+      .lightbox__next { right: 0.35rem; }
+    }
+    figure.mag .frame {
+      background: #f4f4f4;
+      overflow: hidden;
+      width: 100%;
+    }
+    figure.mag .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      vertical-align: middle;
+    }
+    figure.mag.portrait .frame { aspect-ratio: 3 / 4; }
+    figure.mag.square .frame { aspect-ratio: 1 / 1; }
+    figure.mag.landscape .frame { aspect-ratio: 5 / 4; }
+
+    figure.mag.span2 {
+      grid-column: 1 / -1;
+    }
+    @media (min-width: 640px) {
+      figure.mag.span2 .frame { aspect-ratio: 21 / 9; max-height: 420px; }
+    }
+
+    figure.mag figcaption {
+      margin-top: 0.65rem;
+      line-height: 1.45;
+    }
+    figure.mag .title {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      color: var(--ink);
+    }
+    figure.mag .meta-line {
+      display: block;
+      font-size: var(--caption-meta-size);
+      font-weight: 500;
+      color: var(--caption-meta);
+    }
+
+    .cv-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      .cv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .cv-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: lowercase;
+      color: #000000;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid #000000;
+    }
+    .cv-card ul { list-style: none; }
+    .cv-card li {
+      font-size: var(--cap-size);
+      padding: 0.45rem 0;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .cv-card a {
+      color: var(--ink);
+    }
+
+    footer.site-ft {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+      border-top: 1px solid #000000;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: var(--cap-size);
+      color: var(--muted);
+    }
+    footer.site-ft a {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* 앵커 점프 시 상단 스티키 GNB에 가리지 않도록 */
+    .chapter[id^="y"],
+    #note,
+    #cv {
+      scroll-margin-top: var(--topbar-sticky-offset);
+    }
+    /* 연도 라벨과 동일 타이포 · 좌측 작은 열에 두며 배경 없음 */
+    .chapter__year--section {
+      text-transform: lowercase;
+      font-variant-numeric: normal;
+      white-space: normal;
+      background: transparent;
+      padding-right: 0;
+      padding-bottom: 0.35rem;
+    }
+    #cv .chapter__year--section {
+      line-height: 0.92;
+    }
+    .chapter--note .note-photo {
+      background: #f4f4f4;
+      aspect-ratio: 5 / 4;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      max-width: min(100%, 42rem);
+    }
+    .chapter--note .note-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .chapter--note .note-block p {
+      font-size: var(--cap-size);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.65;
+    }
+    .chapter--note .note-block p + p {
+      margin-top: 0.9em;
+    }
+    .chapter--note .note-block + .note-block {
+      margin-top: 2.25rem;
+    }
+    .chapter--cv-block {
+      padding-bottom: 4rem;
+    }
+  </style>
+</head>
+<body id="top">
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="topbar__logo" href="mockup-02-editorial.html#top">whee studio</a>
+      <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+        <a href="#y2024" data-nav-label="2024">2024</a>
+        <a href="#y2023" data-nav-label="2023">2023</a>
+        <a href="#y2021" data-nav-label="2021">2021</a>
+        <a href="#y2020" data-nav-label="2020">2020</a>
+        <a href="#y2019" data-nav-label="2019">2019</a>
+        <a href="#y2018" data-nav-label="2018">2018</a>
+        <a href="#note" data-nav-label="artist note">artist note</a>
+        <a href="#cv" data-nav-label="cv">cv</a>
+      </nav>
+      <div class="topbar__trailing">
+        <button type="button" class="topbar__menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="메뉴 열기">
+          <span class="topbar__burger" aria-hidden="true">
+            <span class="topbar__burger-line"></span>
+            <span class="topbar__burger-line"></span>
+            <span class="topbar__burger-line"></span>
+          </span>
+        </button>
+        <a class="topbar__ig" href="https://www.instagram.com/whee_studio/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1.25" fill="currentColor" stroke="none" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout__main">
+  <article class="chapter" id="y2024">
+    <div class="chapter__intro-band">
+      <span class="chapter__site-title">whee studio</span>
+      <p class="chapter__intro-bio">1984 Born in Seoul, Korea. Lives and works in Seoul and Manila.</p>
+      <p class="chapter__intro-mail">
+        <button type="button" class="chapter__mail-btn" aria-label="이메일 주소 복사" title="woni.cha@gmail.com">woni.cha@gmail.com</button>
+      </p>
+    </div>
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2024</div>
+    </div>
+    <div class="chapter__body">
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-02.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee24a/800/1067" /></div>
+          <figcaption>
+            <span class="title">Garden of Birds of Paradise</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">122 × 91.4 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-03.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee24b/800/1067" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag span2 landscape">
+          <div class="frame"><img src="assets/work-04.jpg" alt="" width="1400" height="600" loading="lazy" data-fallback="https://picsum.photos/seed/whee24wide/1400/600" /></div>
+          <figcaption>
+            <span class="title">Silent Scream</span>
+            <span class="meta-line">Charcoal, pastel, oil crayon, and oil on canvas</span>
+            <span class="meta-line">120 × 132 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2023">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2023</div>
+    </div>
+    <div>
+      <div class="mag-grid mag-grid--spaced">
+        <figure class="mag square">
+          <div class="frame"><img src="assets/work-05.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee23sq/900/900" /></div>
+          <figcaption>
+            <span class="title">Silent Scream III</span>
+            <span class="meta-line">Charcoal, pastel, oil stick, and oil on canvas</span>
+            <span class="meta-line">176.5 × 140.3 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-06.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee23t/800/1067" /></div>
+          <figcaption>
+            <span class="title">Silent Scream II</span>
+            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
+            <span class="meta-line">135.6 × 169.5 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2021">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2021</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-07.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee21a/800/1067" /></div>
+          <figcaption>
+            <span class="title">Silent Scream IV</span>
+            <span class="meta-line">Charcoal, pastel, oil stick, and oil on canvas</span>
+            <span class="meta-line">196 × 140 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-08.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee21b/800/1067" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
+            <span class="meta-line">43.18 × 48.25 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/work-09.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee21c/900/900" /></div>
+          <figcaption>
+            <span class="title">Some Sketches</span>
+            <span class="meta-line">—</span>
+            <span class="meta-line">—</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2020">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2020</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-01.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee20a/800/1067" /></div>
+          <figcaption>
+            <span class="title">I Was Lost but Now I Am Found</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2019">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2019</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag square">
+          <div class="frame"><img src="assets/work-08.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee19a/900/900" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
+            <span class="meta-line">43.18 × 48.25 cm</span>
+            <span class="meta-line">2019</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2018">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2018</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/work-09.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee18a/800/1067" /></div>
+          <figcaption>
+            <span class="title">Some Sketches</span>
+            <span class="meta-line">—</span>
+            <span class="meta-line">—</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <section id="note" class="chapter chapter--note">
+    <div class="chapter__year-rail">
+      <div class="chapter__year chapter__year--section">artist&nbsp;note</div>
+    </div>
+    <div class="chapter__body">
+      <div class="note-photo">
+        <img src="assets/note.jpg" alt="Woni Cha in the studio" width="900" height="720" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
+      </div>
+      <section class="note-block" aria-label="Artist note">
+        <p>I see nature not as a landscape, but as a living entity where emotions accumulate and erupt.</p>
+        <p>My work explores how suppressed emotions twist internally and eventually expand into organic forms.</p>
+        <p>The invisible pressures and tensions I experience as a woman are translated into layers of color, movement, density, and fracture on the canvas.</p>
+        <p>Through uncontrolled gestures and accumulated surfaces, I portray emotions not as something that disappears, but as something that transforms and persists.</p>
+        <p>My paintings are not representations of nature, but manifestations of an inner landscape—a self-generated ecology of emotion.</p>
+      </section>
+      <section class="note-block" aria-label="작가 노트">
+        <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
+        <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
+        <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
+        <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해 감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
+        <p>나의 회화는 풍경이 아니라, 감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
+      </section>
+    </div>
+  </section>
+
+  <section id="cv" class="chapter chapter--cv-block">
+    <div class="chapter__year-rail">
+      <div class="chapter__year chapter__year--section">curriculum<br />vitae</div>
+    </div>
+    <div class="chapter__body">
+      <div class="cv-grid">
+      <div class="cv-card">
+        <h4>Education</h4>
+        <ul>
+          <li>2012 MFA, Sculpture, Seoul National University, Seoul, Korea</li>
+          <li>2007 BFA, Sculpture, Rhode Island School of Design, Providence, Rhode Island, U.S.</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Solo / Awarded</h4>
+        <ul>
+          <li>2025 Silent Scream, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
+          <li>2023 Supreme Yard, Leon Gallery, Manila, Philippines</li>
+          <li>2013 Idolic Bonanza, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
+          <li>2011 Spring up! Mentoring Project 2011, Two Person Exhibition, sponsored by the Seoul Foundation of Arts and Culture, Space Can, Seoul, Korea</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Group exhibition</h4>
+        <ul>
+          <li>2024 Wild: Women Abstractionists on Nature, Metropolitan Museum of Manila, Manila, Philippines</li>
+          <li>2023 Gallery Benefit 2023, National Gallery Singapore, Singapore</li>
+          <li>2022 Art Detour II, Leon Gallery, Manila, Philippines</li>
+          <li>2021 From Vivid Color to Image, Manila House, Manila, Philippines</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Press</h4>
+        <ul>
+          <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer">Wild Women</a></li>
+          <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer">Making art dynamic</a></li>
+          <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer">Solo exhibition</a></li>
+        </ul>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <footer class="site-ft">
+    <a href="mailto:woni.cha@gmail.com">woni.cha@gmail.com</a>
+  </footer>
+  </div>
+
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" hidden>
+    <div class="lightbox__backdrop" data-close-lightbox></div>
+    <button type="button" class="lightbox__btn lightbox__prev" aria-label="이전 작품">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button type="button" class="lightbox__btn lightbox__next" aria-label="다음 작품">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <div class="lightbox__inner">
+      <img class="lightbox__img" alt="" />
+      <div class="lightbox__caption"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var STUDIO_EMAIL = "woni.cha@gmail.com";
+      document.querySelectorAll(".chapter__mail-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var label = btn.getAttribute("aria-label");
+          function done() {
+            btn.setAttribute("aria-label", "복사됨: " + STUDIO_EMAIL);
+            setTimeout(function () {
+              btn.setAttribute("aria-label", label);
+            }, 2000);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(STUDIO_EMAIL).then(done).catch(fallback);
+          } else {
+            fallback();
+          }
+          function fallback() {
+            var ta = document.createElement("textarea");
+            ta.value = STUDIO_EMAIL;
+            ta.setAttribute("readonly", "");
+            ta.style.cssText = "position:fixed;left:-9999px;top:0";
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              if (document.execCommand("copy")) done();
+            } catch (e) {}
+            document.body.removeChild(ta);
+          }
+        });
+      });
+
+      (function () {
+        var topbarEl = document.querySelector(".topbar");
+        var navToggle = document.querySelector(".topbar__menu-toggle");
+        var siteNav = document.getElementById("site-nav");
+        if (!topbarEl || !navToggle || !siteNav) return;
+        var mqMobile = window.matchMedia("(max-width: 767px)");
+
+        function setMobileNavOpen(open) {
+          topbarEl.classList.toggle("is-nav-open", open);
+          navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+          navToggle.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+        }
+
+        navToggle.addEventListener("click", function () {
+          if (!mqMobile.matches) return;
+          setMobileNavOpen(!topbarEl.classList.contains("is-nav-open"));
+        });
+
+        siteNav.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            if (mqMobile.matches) setMobileNavOpen(false);
+          });
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          if (mqMobile.matches && topbarEl.classList.contains("is-nav-open")) setMobileNavOpen(false);
+        });
+
+        function onMqChange() {
+          if (!mqMobile.matches) setMobileNavOpen(false);
+        }
+        if (typeof mqMobile.addEventListener === "function") {
+          mqMobile.addEventListener("change", onMqChange);
+        } else if (typeof mqMobile.addListener === "function") {
+          mqMobile.addListener(onMqChange);
+        }
+      })();
+
+      document.querySelectorAll("img[data-fallback]").forEach(function (img) {
+        var fb = img.getAttribute("data-fallback");
+        if (!fb) return;
+        img.addEventListener("error", function once() {
+          img.removeEventListener("error", once);
+          img.src = fb;
+        });
+      });
+
+      /* 라이트박스: figure.mag 순서대로 전체 작품 갤러리 */
+      var lb = document.getElementById("lightbox");
+      if (lb) {
+        var lbImg = lb.querySelector(".lightbox__img");
+        var lbCap = lb.querySelector(".lightbox__caption");
+        var lbPrev = lb.querySelector(".lightbox__prev");
+        var lbNext = lb.querySelector(".lightbox__next");
+        var cards = Array.prototype.slice
+          .call(document.querySelectorAll(".layout__main figure.mag"))
+          .filter(function (fig) {
+            return fig.querySelector("img");
+          });
+        var lbIdx = 0;
+
+        function captionHTML(fig) {
+          var title = fig.querySelector(".title");
+          var lines = fig.querySelectorAll(".meta-line");
+          var html = "";
+          if (title) html += '<span class="title">' + title.textContent + "</span>";
+          lines.forEach(function (line) {
+            html += '<span class="meta-line">' + line.textContent + "</span>";
+          });
+          return html;
+        }
+
+        function openLightbox(index) {
+          if (!cards.length) return;
+          lbIdx = (index + cards.length) % cards.length;
+          var fig = cards[lbIdx];
+          var imgEl = fig.querySelector("img");
+          lbImg.src = imgEl.currentSrc || imgEl.src;
+          lbImg.alt = imgEl.getAttribute("alt") || "";
+          lbCap.innerHTML = captionHTML(fig);
+          lb.hidden = false;
+          lb.classList.add("is-open");
+          document.body.classList.add("lightbox-open");
+          lbPrev.focus();
+        }
+
+        function closeLightbox() {
+          lb.classList.remove("is-open");
+          document.body.classList.remove("lightbox-open");
+          lb.hidden = true;
+          lbImg.removeAttribute("src");
+        }
+
+        cards.forEach(function (fig, i) {
+          fig.addEventListener("click", function () {
+            openLightbox(i);
+          });
+          fig.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openLightbox(i);
+            }
+          });
+          fig.setAttribute("tabindex", "0");
+          fig.setAttribute("role", "button");
+        });
+
+        lbPrev.addEventListener("click", function (e) {
+          e.stopPropagation();
+          openLightbox(lbIdx - 1);
+        });
+        lbNext.addEventListener("click", function (e) {
+          e.stopPropagation();
+          openLightbox(lbIdx + 1);
+        });
+        lb.querySelectorAll("[data-close-lightbox]").forEach(function (el) {
+          el.addEventListener("click", closeLightbox);
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (!lb.classList.contains("is-open")) return;
+          if (e.key === "Escape") closeLightbox();
+          if (e.key === "ArrowLeft") openLightbox(lbIdx - 1);
+          if (e.key === "ArrowRight") openLightbox(lbIdx + 1);
+        });
+
+        lb.addEventListener("click", function (e) {
+          if (e.target === lb) closeLightbox();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

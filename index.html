@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Whee Studio — 목업 선택</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #1a1a1a;
+      background: #f6f6f6;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+      text-transform: lowercase;
+    }
+    .sub {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+    ul { list-style: none; }
+    li {
+      margin-bottom: 0.75rem;
+    }
+    a.card {
+      display: block;
+      padding: 1.1rem 1.25rem;
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      color: inherit;
+      text-decoration: none;
+      transition: border-color 0.15s;
+    }
+    a.card:hover {
+      border-color: #1a1a1a;
+    }
+    a.card strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    a.card span {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .path {
+      margin-top: 2rem;
+      font-size: 0.72rem;
+      color: #888;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>whee studio — 디자인 목업</h1>
+    <p class="sub">시안 1·2를 고르세요. GitHub Pages에 올리면 이 페이지가 첫 화면입니다. 작품 이미지는 선택으로 <code style="font-size:0.85em;">assets/work-01.jpg</code> … <code style="font-size:0.85em;">09.jpg</code>, 노트는 <code style="font-size:0.85em;">note.jpg</code>를 두면 됩니다.</p>
+    <ul>
+      <li>
+        <a class="card" href="mockup-01-white-cube.html">
+          <strong>시안 1 · White Cube</strong>
+          <span>여백·그리드·작품 중심 갤러리 톤</span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="mockup-02-editorial.html">
+          <strong>시안 2 · Editorial</strong>
+          <span>연도 챕터·잡지형 레이아웃·풀 인용 노트</span>
+        </a>
+      </li>
+      <li>
+        <a class="card" href="mockup-03-archive.html">
+          <strong>시안 3 · Archive</strong>
+          <span>사이드 메뉴·연도 칩·CV 아코디언</span>
+        </a>
+      </li>
+    </ul>
+    <p style="margin-top:1rem;">
+      <a class="card" href="preview-1-and-3.html" style="display:inline-block;padding:0.75rem 1rem;background:#111;color:#fff;border-color:#111;">
+        <strong style="color:#fff;">시안 1 + 2 + 3 한 화면 미리보기</strong>
+        <span style="color:#ccc;display:block;margin-top:0.25rem;">분할 iframe · 「셋 다 새 탭」 버튼 — 로컬 서버로 여세요</span>
+      </a>
+    </p>
+    <p class="path">로컬: <code>index.html</code> 더블클릭. 배포 후: <code>https://&lt;사용자명&gt;.github.io/&lt;저장소명&gt;/</code></p>
+  </div>
+</body>
+</html>
