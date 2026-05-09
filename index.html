@@ -3,159 +3,1754 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>whee studio — 목업</title>
+  <title>Whee Studio — 시안 2 · Editorial</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --paper: #ffffff;
+      --ink: #111111;
+      --muted: #444444;
+      --caption-meta: #8a8a8a;
+      --cap-size: 0.95rem;
+      --caption-meta-size: 0.78rem;
+      --rule: #e8e8e8;
+      /* 넓은 화면에서도 꽉 차게: 캡을 키우고 좌우 패딩을 vw 기반으로 가변화 */
+      --max: 1680px;
+      --chapter-year-size: clamp(2rem, 5vw, 3rem);
+      --chapter-pad-top: 3.5rem;
+      --chapter-pad-x: clamp(1.5rem, 4vw, 4rem);
+      --chapter-col-gap: clamp(1.1rem, 3vw, 2.5rem);
+      /* 가로 스티키 GNB 아래에 연도 라벨 붙이기 (브랜드 제거 후 헤더 높이 반영) */
+      --topbar-sticky-offset: clamp(3.25rem, 9vh, 4.75rem);
+      /* 앵커 이동(#y*, #note, #cv): 챕터 padding-top만큼 위로 보정해
+         연도/Artist Note 라벨이 sticky로 고정되는 그 지점에 정확히 정렬 */
+      --anchor-scroll-margin: calc(var(--topbar-sticky-offset) - var(--chapter-pad-top));
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
       font-family: "Inter", system-ui, sans-serif;
       font-size: 15px;
-      line-height: 1.5;
-      color: #111111;
-      background: #ffffff;
-      min-height: 100vh;
-      padding: clamp(2rem, 6vw, 3.5rem) 1.5rem 3rem;
+      line-height: 1.45;
+      color: var(--ink);
+      background: var(--paper);
       -webkit-font-smoothing: antialiased;
     }
-    .wrap {
-      max-width: 480px;
+
+    /* 미니멀한 슬림 스크롤바 (Firefox & WebKit) */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(17, 17, 17, 0.22) transparent;
+    }
+    *::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    *::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    *::-webkit-scrollbar-thumb {
+      background-color: rgba(17, 17, 17, 0.18);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      transition: background-color 0.2s ease;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(17, 17, 17, 0.4);
+    }
+    *::-webkit-scrollbar-thumb:active {
+      background-color: rgba(17, 17, 17, 0.55);
+    }
+    *::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+    .layout__main {
+      min-width: 0;
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    a:hover { text-decoration-thickness: 1.5px; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+    }
+    .topbar__inner {
+      max-width: var(--max);
       margin: 0 auto;
+      padding: 0.85rem var(--chapter-pad-x) 0.85rem;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.75rem 1rem;
+      box-sizing: border-box;
     }
-    header {
-      padding-bottom: 1.5rem;
-      margin-bottom: 1.75rem;
-      border-bottom: 1px solid #000000;
+    .topbar__trailing {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0.65rem;
+      margin-left: auto;
+      flex-shrink: 0;
+      order: 1;
     }
-    .eyebrow {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #8a8a8a;
-      margin-bottom: 0.5rem;
+    .topbar__menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: #000000;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-sizing: content-box;
     }
-    h1 {
-      font-size: clamp(1.35rem, 4vw, 1.65rem);
+    .topbar__menu-toggle:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+    .topbar__burger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+    }
+    .topbar__burger-line {
+      display: block;
+      height: 2px;
+      width: 100%;
+      background: #000000;
+      border-radius: 0;
+    }
+    .nav {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem 1.15rem;
+      font-size: var(--cap-size);
+      font-weight: 400;
+      letter-spacing: 0;
+      flex: 1;
+      min-width: 0;
+      order: 2;
+    }
+    .nav a {
+      color: #000000;
+      text-decoration: none;
+      font-weight: 400;
+      text-shadow: none;
+      white-space: nowrap;
+      display: inline-block;
+      text-align: center;
+    }
+    /* 숨은 볼드 레이아웃: 폭은 항상 700 기준으로 잡아 호버 시 너비 변화 없음 */
+    .nav a::before {
+      content: attr(data-nav-label);
+      display: block;
+      font-weight: 700;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .nav a:hover,
+    .nav a:focus-visible {
+      text-decoration: none;
+      font-weight: 700;
+      text-shadow: none;
+    }
+    .topbar__ig {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+      color: #000000;
+      opacity: 1;
+      flex-shrink: 0;
+    }
+    .topbar__ig:hover {
+      text-decoration: none;
+      opacity: 0.55;
+    }
+    .topbar__ig svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    @media (max-width: 767px) {
+      .topbar__inner {
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .topbar__menu-toggle {
+        display: inline-flex;
+      }
+      .topbar__trailing {
+        order: 1;
+        margin-left: auto;
+        flex-direction: row-reverse;
+      }
+      .nav {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        flex: 1 0 100%;
+        width: 100%;
+        order: 2;
+        padding-top: 0.65rem;
+        margin-top: 0.35rem;
+        border-top: 1px solid #000000;
+        gap: 0.55rem 0;
+      }
+      .topbar.is-nav-open .nav {
+        display: flex;
+      }
+      .nav a {
+        display: block;
+        padding: 0.35rem 0;
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .topbar__inner {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 1rem 1.5rem;
+      }
+      .topbar__menu-toggle {
+        display: none !important;
+      }
+      .nav {
+        display: flex !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        flex: 1;
+        order: 1;
+        padding-top: 0;
+        margin-top: 0;
+        border-top: none;
+      }
+      .topbar__trailing {
+        order: 2;
+        margin-left: 0;
+      }
+      .topbar.is-nav-open .nav {
+        display: flex !important;
+      }
+    }
+
+    .chapter.chapter--intro-only {
+      display: block;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: var(--chapter-pad-top) var(--chapter-pad-x) 0;
+    }
+    .chapter.chapter--intro-only .chapter__intro-band {
+      margin-bottom: 0;
+    }
+    .chapter.chapter--intro-only + .chapter {
+      padding-top: 1.5rem;
+    }
+
+    .chapter {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: var(--chapter-pad-top) var(--chapter-pad-x) 1rem;
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      .chapter {
+        /* 소개 카피·연도 열 너비 통일 (첫 챕터와 이후 연도 세로 정렬) */
+        grid-template-columns: minmax(168px, 260px) minmax(0, 1fr);
+        align-items: stretch;
+        column-gap: var(--chapter-col-gap);
+        row-gap: 1.5rem;
+      }
+    }
+    @media (min-width: 1280px) {
+      .chapter {
+        /* 큰 모니터에서 본문이 넓어지는 만큼 연도 레일도 비례 확장 */
+        grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+      }
+    }
+    .chapter.chapter--note,
+    .chapter.chapter--cv-block {
+      padding-top: calc(var(--chapter-pad-top) + clamp(0.85rem, 2.5vw, 1.75rem));
+    }
+    /* 첫 챕터: 소개는 전체 폭 행 → 이미지 열과 겹치지 않음 */
+    .chapter__intro-band {
+      grid-column: 1 / -1;
+      max-width: min(36rem, 100%);
+      margin-bottom: 0.25rem;
+    }
+    /* 왼쪽 열: 그리드 stretch로 오른쪽 작품 열과 같은 행 높이 → .chapter__year 스티키 구간 확보 */
+    .chapter__year-rail {
+      display: block;
+      min-width: 0;
+    }
+    /* 인트로 큰 타이틀 → 스크롤로 화면에서 사라지면 topbar에 작은 로고만 표시 */
+    .chapter__site-title {
+      font-family: "Inter", system-ui, sans-serif;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .chapter__site-title:hover { text-decoration: none; }
+    .chapter__site-title--hero {
+      display: block;
+      font-size: var(--chapter-year-size);
       font-weight: 700;
       letter-spacing: -0.03em;
-      text-transform: lowercase;
-      line-height: 1.15;
+      line-height: 1;
+      margin: 0 0 3rem;
+      max-width: 100%;
     }
-    .sub {
-      margin-top: 0.85rem;
-      font-size: 0.82rem;
+    .chapter__site-title--topbar {
+      flex-shrink: 0;
+      order: 0;
+      align-self: center;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.25;
+      white-space: nowrap;
+      vertical-align: middle;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+    }
+    .topbar.show-compact-brand .chapter__site-title--topbar {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.35s ease, visibility 0s linear 0s;
+    }
+    /* CV 본문(.cv-card li)과 동일 타이포 */
+    .chapter__intro-bio {
+      margin: 0;
+      margin-top: 0.65rem;
+      font-size: var(--cap-size);
       font-weight: 400;
-      color: #444444;
+      color: var(--ink);
       line-height: 1.55;
     }
-    .sub code {
-      font-size: 0.78em;
-      font-weight: 500;
-      color: #111;
-      background: #f4f4f4;
-      padding: 0.1em 0.35em;
-      border-radius: 3px;
+    .chapter__intro-mail {
+      margin: 0;
+      margin-top: 0.15rem;
     }
-    ul { list-style: none; }
-    li { margin-bottom: 0.65rem; }
-    a.card {
-      display: block;
-      padding: 1rem 1.1rem;
-      background: #ffffff;
-      border: 1px solid #e8e8e8;
-      color: inherit;
-      text-decoration: none;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease;
-    }
-    a.card:hover {
-      border-color: #000000;
-      box-shadow: 0 1px 0 0 #000;
-    }
-    a.card:focus-visible {
-      outline: 2px solid #000;
-      outline-offset: 3px;
-    }
-    a.card strong {
-      display: block;
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.3rem;
-      text-transform: lowercase;
-    }
-    a.card span.desc {
-      font-size: 0.8rem;
+    .chapter__mail-btn {
+      font: inherit;
+      font-size: var(--cap-size);
       font-weight: 400;
-      color: #666666;
+      color: var(--ink);
+      line-height: 1.55;
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+    }
+    .chapter__mail-btn:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .chapter > div:not(.chapter__year) {
+      min-width: 0;
+    }
+    .chapter__year {
+      font-family: "Inter", system-ui, sans-serif;
+      font-size: var(--chapter-year-size);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      line-height: 0.95;
+      position: sticky;
+      top: var(--topbar-sticky-offset);
+      z-index: 2;
+      color: var(--ink);
+      background: var(--paper);
+      padding-bottom: 0.35rem;
+      padding-right: 0.35rem;
+      max-width: 100%;
+    }
+    .mag-grid {
+      display: grid;
+      column-gap: clamp(0.5rem, 0.9vw, 0.85rem);
+      row-gap: clamp(2.35rem, 4vw, 3.25rem);
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 640px) {
+      .mag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 1400px) {
+      .mag-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    .mag-grid--spaced { margin-top: 1rem; }
+
+    figure.mag {
+      margin: 0;
+      cursor: pointer;
+    }
+    figure.mag:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 4px;
+    }
+
+    /* 작품 라이트박스 (시안 1과 동일 패턴) */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 4.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+    .lightbox.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lightbox__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      cursor: pointer;
+    }
+    .lightbox__inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: min(92vw, 1280px);
+      max-height: calc(100vh - 6rem);
+      pointer-events: none;
+    }
+    .lightbox__img {
+      pointer-events: auto;
+      max-width: 100%;
+      max-height: calc(100vh - 11rem);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox__img {
+        transition: none;
+      }
+    }
+    .lightbox__grid {
+      pointer-events: auto;
+    }
+    .lightbox__caption {
+      margin-top: 1.25rem;
+      text-align: center;
+      max-width: 36rem;
+      pointer-events: none;
+    }
+    .lightbox__caption .title {
+      display: block;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+    .lightbox__caption .meta-line {
+      display: block;
+      font-size: var(--caption-meta-size);
+      font-weight: 500;
+      color: var(--caption-meta);
+    }
+    .lightbox__btn {
+      pointer-events: auto;
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #000000;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.55;
+      transition: opacity 0.18s ease, background 0.2s ease, transform 0.25s ease;
+    }
+    .lightbox__btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lightbox__btn:hover,
+    .lightbox__btn:focus-visible {
+      opacity: 1;
+    }
+    .lightbox__btn:hover::before,
+    .lightbox__btn:focus-visible::before {
+      opacity: 1;
+    }
+    .lightbox__btn:focus {
+      outline: none;
+    }
+    .lightbox__btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px #000000;
+    }
+    .lightbox:focus { outline: none; }
+    .lightbox__btn:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+    .lightbox__prev {
+      left: max(1.25rem, env(safe-area-inset-left));
+      transform: translate(0, -50%);
+    }
+    .lightbox__next {
+      right: max(1.25rem, env(safe-area-inset-right));
+      transform: translate(0, -50%);
+    }
+    .lightbox__prev:hover { transform: translate(-3px, -50%); }
+    .lightbox__next:hover { transform: translate(3px, -50%); }
+    .lightbox__btn svg {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.5;
+    }
+    body.lightbox-open {
+      overflow: hidden;
+    }
+    @media (max-width: 640px) {
+      .lightbox {
+        padding: 3.5rem 0.75rem;
+      }
+      .lightbox__btn {
+        width: 44px;
+        height: 44px;
+      }
+      .lightbox__btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .lightbox__prev { left: 0.5rem; }
+      .lightbox__next { right: 0.5rem; }
+      .lightbox__prev:hover { transform: translate(-2px, -50%); }
+      .lightbox__next:hover { transform: translate(2px, -50%); }
+    }
+    figure.mag .frame {
+      background: transparent;
+      width: 100%;
+    }
+    figure.mag .frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+      vertical-align: middle;
+    }
+
+    figure.mag.span2 {
+      grid-column: 1 / -1;
+    }
+    @media (min-width: 640px) {
+      figure.mag.span2 .frame {
+        max-width: min(100%, 880px);
+        margin: 0 auto;
+      }
+    }
+    @media (min-width: 1400px) {
+      /* 3단 그리드에서 span2는 2칸을 차지(전체 폭이 아니라) */
+      figure.mag.span2 {
+        grid-column: span 2;
+      }
+    }
+
+    /* 스케치 시리즈: 자동 디졸브(페이드) */
+    figure.mag.sketch-carousel { cursor: pointer; }
+    .sketch-frame {
+      position: relative;
+      background: #f0f0f0;
+      aspect-ratio: 600 / 820;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .sketch-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .sketch-slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: #f0f0f0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.32s ease-in-out;
+    }
+    .sketch-slide.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sketch-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* 라이트박스 안의 6장 그리드(Some Sketches 전용 뷰) */
+    .lightbox__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.25rem, 0.45vw, 0.45rem);
+      width: min(92vw, 1280px);
+      height: calc(100vh - 11rem);
+      max-height: 100%;
+    }
+    .lightbox__grid figure {
+      margin: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .lightbox__grid img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    @media (max-width: 720px) {
+      .lightbox__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        height: calc(100vh - 10rem);
+      }
+    }
+    @media (max-width: 420px) {
+      .lightbox__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 0.25rem;
+      }
+    }
+
+    figure.mag figcaption {
+      margin-top: 0.65rem;
       line-height: 1.45;
     }
-    a.card--invert {
-      margin-top: 0.35rem;
-      background: #111111;
-      border-color: #111111;
-      color: #ffffff;
+    figure.mag .title {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      color: var(--ink);
     }
-    a.card--invert:hover {
-      border-color: #000;
-      box-shadow: none;
-      opacity: 0.94;
+    figure.mag .meta-line {
+      display: block;
+      font-size: var(--caption-meta-size);
+      font-weight: 500;
+      color: var(--caption-meta);
     }
-    a.card--invert strong { color: #fff; }
-    a.card--invert span.desc { color: #c8c8c8; }
-    footer {
-      margin-top: 2.25rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid #e8e8e8;
-      font-size: 0.72rem;
-      color: #8a8a8a;
+
+    .cv-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 720px) {
+      .cv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .cv-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #000000;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid #000000;
+    }
+    .cv-card ul { list-style: none; }
+    .cv-card li {
+      font-size: var(--cap-size);
+      padding: 0.45rem 0;
+      color: var(--ink);
       line-height: 1.55;
     }
-    footer code {
-      font-size: 1em;
-      color: #444;
-      word-break: break-all;
+    .cv-card a {
+      color: var(--ink);
+    }
+
+    footer.site-ft {
+      position: relative;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2rem var(--chapter-pad-x) 3rem;
+      border-top: none;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: var(--cap-size);
+      color: var(--muted);
+    }
+    /* 탑바(.topbar__inner)와 동일 좌우 패딩(chapter-pad-x)으로 이메일 ↔ Whee 정렬 */
+    footer.site-ft::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 100vw;
+      height: 1px;
+      background: #000000;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    footer.site-ft a {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: clamp(1.25rem, 4vh, 2rem);
+      transform: translate(-50%, 12px);
+      z-index: 400;
+      padding: 0.7rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.92);
+      color: #ffffff;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.25s ease;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    }
+    .toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .toast { transition: opacity 0.2s ease; transform: translate(-50%, 0); }
+    }
+
+    /* 앵커 점프 시 상단 스티키 GNB에 가리지 않도록 — 라벨이 sticky 위치에 딱 맞도록 보정 */
+    .chapter[id^="y"] {
+      scroll-margin-top: var(--anchor-scroll-margin);
+    }
+    /* 첫 연도 챕터(인트로 직후)는 padding-top: 1.5rem 으로 더 작음 → 보정값도 그에 맞게 */
+    .chapter.chapter--intro-only + .chapter[id^="y"] {
+      scroll-margin-top: calc(var(--topbar-sticky-offset) - 1.5rem);
+    }
+    /* Artist Note / CV는 챕터 padding-top이 더 큼(--chapter-pad-top + 추가분) → 같은 양만큼 더 빼줌 */
+    #note,
+    #cv {
+      scroll-margin-top: calc(var(--anchor-scroll-margin) - clamp(0.85rem, 2.5vw, 1.75rem));
+    }
+    /* 연도 라벨과 동일 타이포 · 좌측 작은 열에 두며 배경 없음 */
+    .chapter__year--section {
+      font-variant-numeric: normal;
+      white-space: normal;
+      background: transparent;
+      padding-right: 0;
+      padding-bottom: 0.35rem;
+    }
+    @media (max-width: 719px) {
+      .chapter__year--section br { display: none; }
+    }
+    #cv .chapter__year--section {
+      line-height: 0.92;
+    }
+    .chapter--note .note-photo {
+      margin-bottom: 1.5rem;
+      max-width: 100%;
+    }
+    .chapter--note .note-photo img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .chapter--note .note-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 720px) {
+      .chapter--note .note-layout {
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        column-gap: clamp(1.5rem, 3vw, 2.5rem);
+        align-items: start;
+      }
+      .chapter--note .note-photo {
+        position: sticky;
+        top: var(--topbar-sticky-offset);
+        margin-bottom: 0;
+      }
+    }
+    .chapter--note .note-block p {
+      font-size: var(--cap-size);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.65;
+      /* 자연스러운 줄바꿈: 한글은 어절 단위로 끊기고(영문도 단어 중간 분리 안 함),
+         지원 브라우저에선 줄 균형까지 맞춰 'nature, but' 같은 어색한 끊김 방지 */
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-wrap: pretty;
+      hanging-punctuation: first allow-end last;
+    }
+    .chapter--note .note-block p + p {
+      margin-top: 0.9em;
+    }
+    .chapter--note .note-block + .note-block {
+      margin-top: 2.25rem;
+    }
+    .chapter--cv-block {
+      padding-bottom: 4rem;
     }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <header>
-      <p class="eyebrow">design mockups</p>
-      <h1>whee studio</h1>
-      <p class="sub">시안을 고른 뒤 각 HTML로 이동합니다. 이미지는 선택 사항으로 <code>assets/work-01.jpg</code> … <code>09.jpg</code>, 노트는 <code>note.jpg</code>를 두면 됩니다.</p>
-    </header>
-    <ul>
-      <li>
-        <a class="card" href="mockup-01-white-cube.html">
-          <strong>시안 1 · white cube</strong>
-          <span class="desc">여백·그리드·작품 중심 갤러리 톤</span>
+<body id="top">
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="chapter__site-title chapter__site-title--topbar" href="#top" aria-label="Whee — 처음으로" aria-hidden="true" tabindex="-1">Whee</a>
+      <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+        <a href="#y2025" data-nav-label="2025">2025</a>
+        <a href="#y2024" data-nav-label="2024">2024</a>
+        <a href="#y2023" data-nav-label="2023">2023</a>
+        <a href="#y2021" data-nav-label="2021">2021</a>
+        <a href="#y2020" data-nav-label="2020">2020</a>
+        <a href="#y2019" data-nav-label="2019">2019</a>
+        <a href="#y2018" data-nav-label="2018">2018</a>
+        <a href="#note" data-nav-label="Artist Note">Artist Note</a>
+        <a href="#cv" data-nav-label="CV">CV</a>
+      </nav>
+      <div class="topbar__trailing">
+        <button type="button" class="topbar__menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="메뉴 열기">
+          <span class="topbar__burger" aria-hidden="true">
+            <span class="topbar__burger-line"></span>
+            <span class="topbar__burger-line"></span>
+            <span class="topbar__burger-line"></span>
+          </span>
+        </button>
+        <a class="topbar__ig" href="https://www.instagram.com/whee_studio/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1.25" fill="currentColor" stroke="none" />
+          </svg>
         </a>
-      </li>
-      <li>
-        <a class="card" href="mockup-02-editorial.html">
-          <strong>시안 2 · editorial</strong>
-          <span class="desc">연도 챕터·잡지형 레이아웃·노트 풀폭</span>
-        </a>
-      </li>
-      <li>
-        <a class="card" href="mockup-03-archive.html">
-          <strong>시안 3 · archive</strong>
-          <span class="desc">사이드 메뉴·연도 칩·CV 아코디언</span>
-        </a>
-      </li>
-      <li>
-        <a class="card card--invert" href="preview-1-and-3.html">
-          <strong>시안 1 + 2 + 3 · 분할 미리보기</strong>
-          <span class="desc">iframe 분할 · 새 탭으로 열기 — 로컬에서 파일 열면 동작합니다.</span>
-        </a>
-      </li>
-    </ul>
-    <footer>
-      로컬: <code>index.html</code> 더블클릭 · 배포: GitHub Pages 또는 Vercel에 같은 폴더 연결 후 자동 반영
-    </footer>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout__main">
+  <div class="chapter chapter--intro-only">
+    <div class="chapter__intro-band">
+      <h1 class="chapter__site-title chapter__site-title--hero">Whee</h1>
+      <p class="chapter__intro-bio">1984 Born in Seoul, Korea. Lives and works in Seoul and Manila.</p>
+      <p class="chapter__intro-mail">
+        <button type="button" class="chapter__mail-btn" aria-label="이메일 주소 복사" title="woni.cha@gmail.com">woni.cha@gmail.com</button>
+      </p>
+    </div>
   </div>
+
+  <article class="chapter" id="y2025">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2025</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Silent%20Scream%20%202025%20Oil%2C%20charcoal%2C%20oil%20crayon%20and%20oil%20paint%20on%20canvas%20%20120%20x%20132%20cm.jpg" alt="Silent Scream" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream</span>
+            <span class="meta-line">Oil, charcoal, oil crayon and oil paint on canvas</span>
+            <span class="meta-line">120 × 132 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Silent%20Scream%20II%20%202025%20Soft%20pastel%2C%20charcoal%2C%20oil%20pastel%20and%20oil%20paint%20on%20canvas%20%20135.6%20x%20169.5%20cm.jpg" alt="Silent Scream II" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream II</span>
+            <span class="meta-line">Soft pastel, charcoal, oil pastel and oil paint on canvas</span>
+            <span class="meta-line">135.6 × 169.5 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20III%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20176.5%20x%20140.3%20cm%20.jpeg" alt="Silent Scream III" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream III</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">176.5 × 140.3 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png" alt="Silent Scream IV" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream IV</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">196 × 140 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Untitled%20%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20%2043.15%20x%2048.25%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">43.15 × 48.25 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2024">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2024</div>
+    </div>
+    <div class="chapter__body">
+      <div class="mag-grid">
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Garden%20of%20Birds%20of%20Paradise%20%202024%20Acrylic%20and%20oil%20on%20canvas%20122%20x%2091.4%20cm.jpg" alt="Garden of Birds of Paradise" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Garden of Birds of Paradise</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">122 × 91.4 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/I%20Was%20Lost%20but%20Now%20I%20Am%20Found%20%202024%20Acrylic%20and%20oil%20on%20canvas%20%20169%20x%20118%20cm.jpg" alt="I Was Lost but Now I Am Found" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">I Was Lost but Now I Am Found</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202024%20Oil%20on%20canvas%20169%20x%20118%20cm.jpg" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag sketch-carousel" data-sketch-count="6">
+          <div class="frame sketch-frame">
+            <div class="sketch-stage" aria-live="polite" aria-label="Some Sketches — automatic slideshow">
+              <div class="sketch-slide is-active"><img src="assets/Some%20Sketches%201.png" alt="Some Sketches — 1 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%202.jpg" alt="Some Sketches — 2 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%203.jpg" alt="Some Sketches — 3 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%204.jpg" alt="Some Sketches — 4 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%205.jpg" alt="Some Sketches — 5 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%206.jpg" alt="Some Sketches — 6 of 6" loading="lazy" /></div>
+            </div>
+          </div>
+          <figcaption>
+            <span class="title">Some Sketches</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2023">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2023</div>
+    </div>
+    <div>
+      <div class="mag-grid mag-grid--spaced">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/A%20Study%20for%20Nature%20%202023%20Watercolor%20and%20acrylic%20on%20paper%20111%20x%20147%20cm.png" alt="A Study for Nature" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">A Study for Nature</span>
+            <span class="meta-line">Watercolor and acrylic on paper</span>
+            <span class="meta-line">111 × 147 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/All%20of%20Me%20Wants%20All%20of%20You%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20182%20x%20142%20cm.png" alt="All of Me Wants All of You" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">All of Me Wants All of You</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">182 × 142 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Breathe%20In%20and%20Breathe%20Out%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20102%20x%2080%20cm.png" alt="Breathe In and Breathe Out" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Breathe In and Breathe Out</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">102 × 80 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Frozen%20%202023%20Acrylic%20on%20canvas%20163%20x%20130%20cm.png" alt="Frozen" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Frozen</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">163 × 130 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Starry%20Night%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20122%20x%20122%20cm.png" alt="Starry Night" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Starry Night</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">122 × 122 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%20on%20canvas%20%20164%20x%20135%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">164 × 135 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%2C%20watercolor%20and%20acrylic%20on%20canvas%20%20135%20x%20112%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil, watercolor and acrylic on canvas</span>
+            <span class="meta-line">135 × 112 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2021">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2021</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Juju%20Eyeballs%20%202021%20Oil%20on%20canvas%20145%20x%20112%20cm.png" alt="Juju Eyeballs" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Juju Eyeballs</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">145 × 112 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Yummy%20%202021%20Acrylic%20on%20canvas%20160%20x%20119%20cm.png" alt="Yummy" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Yummy</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">160 × 119 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Wild%20Capture%20%202021%20Acrylic%20on%20canvas%20163%20x%20259%20cm.png" alt="Wild Capture" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Wild Capture</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">163 × 259 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2020">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2020</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/A%20Doll%E2%80%99s%20Dream%20%202020%20Oil%20on%20canvas%2091%20x%20121%20cm.png" alt="A Doll’s Dream" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">A Doll’s Dream</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 121 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/A%20Mirror%20Reflection%20of%20a%20Woman%E2%80%99s%20Back%20%202020%20Oil%20on%20canvas%20145%20x%20112%20cm.png" alt="A Mirror Reflection of a Woman’s Back" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">A Mirror Reflection of a Woman’s Back</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">145 × 112 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Nude%20Peach%20at%20Venice%20Beach%20%202020%20Oil%20on%20canvas%20163%20x%20262%20cm.png" alt="Nude Peach at Venice Beach" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Nude Peach at Venice Beach</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">163 × 262 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2019">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2019</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Garden%20of%20Edan%20%202019%20Oil%20on%20canvas%20260%20x%20163%20cm.png" alt="Garden of Edan" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Garden of Edan</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">260 × 163 cm</span>
+            <span class="meta-line">2019</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Magic%20Castle%20%202019%20Oil%20on%20canvas%20260%20x%20163%20cm.png" alt="Magic Castle" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Magic Castle</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">260 × 163 cm</span>
+            <span class="meta-line">2019</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2018">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2018</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-1%20%202018%20Oil%20on%20canvas%20160%20x%20180%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-1" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-1</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">160 × 180 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-2%20%202018%20Oil%20on%20canvas%2091%20x%2073%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-2" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-2</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 73 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-3%20%202018%20Oil%20on%20canvas%2091%20x%2073%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-3" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-3</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 73 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Untitled%20%202018%20Oil%20on%20canvas%20129%20x%20161cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">129 × 161 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <section id="note" class="chapter chapter--note">
+    <div class="chapter__year-rail">
+      <div class="chapter__year chapter__year--section">Artist Note</div>
+    </div>
+    <div class="chapter__body">
+      <div class="note-layout">
+        <div class="note-photo">
+          <img src="assets/Artist%20Note.jpg" alt="Woni Cha in the studio" width="1080" height="1509" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
+        </div>
+        <div class="note-text">
+          <section class="note-block" aria-label="Artist note">
+            <p>I see nature not as a landscape, but as a living entity where emotions accumulate and erupt.</p>
+            <p>My work explores how suppressed emotions twist internally and eventually expand into organic forms.</p>
+            <p>The invisible pressures and tensions I experience as a woman are translated into layers of color, movement, density, and fracture on the canvas.</p>
+            <p>Through uncontrolled gestures and accumulated surfaces, I portray emotions not as something that disappears, but as something that transforms and persists.</p>
+            <p>My paintings are not representations of nature, but manifestations of an inner landscape—a self-generated ecology of emotion.</p>
+          </section>
+          <section class="note-block" aria-label="작가 노트">
+            <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
+            <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
+            <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
+            <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해 감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
+            <p>나의 회화는 풍경이 아니라, 감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cv" class="chapter chapter--cv-block">
+    <div class="chapter__year-rail">
+      <div class="chapter__year chapter__year--section">Curriculum <br />Vitae</div>
+    </div>
+    <div class="chapter__body">
+      <div class="cv-grid">
+      <div class="cv-card">
+        <h4>Education</h4>
+        <ul>
+          <li>2012 MFA, Sculpture, Seoul National University, Seoul, Korea</li>
+          <li>2007 BFA, Sculpture, Rhode Island School of Design, Providence, Rhode Island, U.S.</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Solo Exhibition / Awarded Exhibition</h4>
+        <ul>
+          <li>2025 <em>Silent Scream</em>, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
+          <li>2023 <em>Supreme Yard</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2013 <em>Idolic Bonanza</em>, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
+          <li>2011 <em>Spring up! Mentoring Project 2011</em>, Two Person Exhibition - Seoul Foundation of Arts and Culture Sponsored Project, Space Can, Seoul, Korea</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Group Exhibition</h4>
+        <ul>
+          <li>2024 <em>Wild: Women Abstractionists on Nature</em>, Metropolitan Museum of Manila, Manila, Philippines</li>
+          <li>2023 <em>Gallery Benefit 2023</em>, National Gallery Singapore, Singapore</li>
+          <li>2022 <em>Art Detour II</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2021 <em>From Vivid Color to Image</em>, Manila House, Manila, Philippines</li>
+          <li>2021 <em>Art Detour</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2020 <em>Women and Time</em>, Assumption College, Manila, Philippines</li>
+          <li>2018 <em>Heritage-Trace: RISD exhibition</em>, L'espass 71 Gallery, Seoul, Korea</li>
+          <li>2017 <em>1968 Contemporary Space 2017</em>, Contemporary Space Association 50 Year Anniversary Exhibition, Kim Jong-young Museum, Seoul, Korea</li>
+          <li>2017 <em>RED: RISD Exhibition</em>, Sophis Gallery, Seoul, Korea</li>
+          <li>2015 <em>Prelude for Twenty Differences</em>, Art Space Flask, Seoul, Korea</li>
+          <li>2012 <em>Exhibition for Outstanding Graduate Students</em>, Seoul National University Museum of Art MOA, Gwanak-gu, Seoul, Korea</li>
+        </ul>
+      </div>
+      <div class="cv-card">
+        <h4>Press</h4>
+        <ul>
+          <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer"><em>Wild Women</em></a></li>
+          <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer"><em>Wonhee Delgado embodies the delights of making art dynamic</em></a></li>
+          <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer"><em>León Gallery presents Whee's solo exhibition, showcasing fantasy as a journey to the self</em></a></li>
+          <li>2023 Art Plus — <a href="https://artplus.ph/features/fantasy-and-fusion?format=amp" target="_blank" rel="noopener noreferrer"><em>Fantasy and Fusion</em></a></li>
+          <li>2023 Philstar Life — <a href="https://philstarlife.com/geeky/219297-whee-cha-delgado-vibrant-art?page=3" target="_blank" rel="noopener noreferrer"><em>Whee Cha Delgado's vibrant art</em></a></li>
+          <li>2022 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/making-a-statement-wonhee-delgado" target="_blank" rel="noopener noreferrer"><em>South Korean painter Wonhee Delgado finds her home amid the Manila art scene</em></a></li>
+          <li>2021 Philstar Life — <a href="https://www.philstar.com/lifestyle/fashion-and-beauty/2021/06/30/2108964/art-detour-leon-gallery" target="_blank" rel="noopener noreferrer"><em>'Art Detour' at Leon Gallery</em></a></li>
+        </ul>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <footer class="site-ft">
+    <a class="js-mail-copy" href="mailto:woni.cha@gmail.com">woni.cha@gmail.com</a>
+  </footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" tabindex="-1" hidden>
+    <div class="lightbox__backdrop" data-close-lightbox></div>
+    <button type="button" class="lightbox__btn lightbox__prev" aria-label="이전 작품">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button type="button" class="lightbox__btn lightbox__next" aria-label="다음 작품">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <div class="lightbox__inner">
+      <img class="lightbox__img" alt="" />
+      <div class="lightbox__grid" hidden></div>
+      <div class="lightbox__caption"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var STUDIO_EMAIL = "woni.cha@gmail.com";
+      var toastEl = document.getElementById("toast");
+      var toastTimer = null;
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.add("is-visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove("is-visible");
+        }, 1800);
+      }
+
+      function copyEmail() {
+        function done() { showToast("Email copied to clipboard"); }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = STUDIO_EMAIL;
+          ta.setAttribute("readonly", "");
+          ta.style.cssText = "position:fixed;left:-9999px;top:0";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            if (document.execCommand("copy")) done();
+          } catch (e) {}
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(STUDIO_EMAIL).then(done).catch(fallback);
+        } else {
+          fallback();
+        }
+      }
+
+      document.querySelectorAll(".chapter__mail-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          copyEmail();
+        });
+      });
+
+      document.querySelectorAll(".js-mail-copy").forEach(function (link) {
+        link.addEventListener("click", function () {
+          copyEmail();
+        });
+      });
+
+      (function () {
+        var topbarEl = document.querySelector(".topbar");
+        var heroTitle = document.querySelector(".chapter__site-title--hero");
+        var compactBrand = document.querySelector(".chapter__site-title--topbar");
+        if (!topbarEl || !heroTitle) return;
+
+        function setCompactBrand(on) {
+          topbarEl.classList.toggle("show-compact-brand", on);
+          if (compactBrand) {
+            compactBrand.setAttribute("aria-hidden", on ? "false" : "true");
+            compactBrand.setAttribute("tabindex", on ? "0" : "-1");
+          }
+        }
+
+        if (typeof IntersectionObserver === "undefined") {
+          setCompactBrand((window.scrollY || 0) > 120);
+          window.addEventListener(
+            "scroll",
+            function () {
+              var r = heroTitle.getBoundingClientRect();
+              setCompactBrand(r.bottom < 8);
+            },
+            { passive: true }
+          );
+          return;
+        }
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var heroStillVisible = entry.isIntersecting && entry.intersectionRatio > 0;
+              setCompactBrand(!heroStillVisible);
+            });
+          },
+          {
+            root: null,
+            rootMargin: "-52px 0px 0px 0px",
+            threshold: [0, 0.01, 0.25, 0.5, 1],
+          }
+        );
+        io.observe(heroTitle);
+      })();
+
+      (function () {
+        var topbarEl = document.querySelector(".topbar");
+        var navToggle = document.querySelector(".topbar__menu-toggle");
+        var siteNav = document.getElementById("site-nav");
+        if (!topbarEl || !navToggle || !siteNav) return;
+        var mqMobile = window.matchMedia("(max-width: 767px)");
+
+        function setMobileNavOpen(open) {
+          topbarEl.classList.toggle("is-nav-open", open);
+          navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+          navToggle.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+        }
+
+        navToggle.addEventListener("click", function () {
+          if (!mqMobile.matches) return;
+          setMobileNavOpen(!topbarEl.classList.contains("is-nav-open"));
+        });
+
+        siteNav.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            if (mqMobile.matches) setMobileNavOpen(false);
+          });
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          if (mqMobile.matches && topbarEl.classList.contains("is-nav-open")) setMobileNavOpen(false);
+        });
+
+        function onMqChange() {
+          if (!mqMobile.matches) setMobileNavOpen(false);
+        }
+        if (typeof mqMobile.addEventListener === "function") {
+          mqMobile.addEventListener("change", onMqChange);
+        } else if (typeof mqMobile.addListener === "function") {
+          mqMobile.addListener(onMqChange);
+        }
+      })();
+
+      document.querySelectorAll("img[data-fallback]").forEach(function (img) {
+        var fb = img.getAttribute("data-fallback");
+        if (!fb) return;
+        img.addEventListener("error", function once() {
+          img.removeEventListener("error", once);
+          img.src = fb;
+        });
+      });
+
+      /* 라이트박스 (Some Sketches는 6장 그리드 뷰로 통합) */
+      var lb = document.getElementById("lightbox");
+      var pausedSketchCarousel = null;
+
+      if (lb) {
+        var lbImg = lb.querySelector(".lightbox__img");
+        var lbGrid = lb.querySelector(".lightbox__grid");
+        var lbCap = lb.querySelector(".lightbox__caption");
+        var lbPrev = lb.querySelector(".lightbox__prev");
+        var lbNext = lb.querySelector(".lightbox__next");
+        var cards = Array.prototype.slice
+          .call(document.querySelectorAll(".layout__main figure.mag"))
+          .filter(function (fig) {
+            return fig.querySelector("img");
+          });
+        var lbIdx = 0;
+        var lbNavGen = 0;
+        var lbReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        function captionHTML(fig) {
+          var title = fig.querySelector(".title");
+          var lines = fig.querySelectorAll(".meta-line");
+          var html = "";
+          if (title) html += '<span class="title">' + title.textContent + "</span>";
+          lines.forEach(function (line) {
+            html += '<span class="meta-line">' + line.textContent + "</span>";
+          });
+          return html;
+        }
+
+        function renderSketchGrid(fig) {
+          if (!lbGrid) return;
+          lbGrid.innerHTML = "";
+          var imgs = fig.querySelectorAll(".sketch-slide img");
+          imgs.forEach(function (img, i) {
+            var cell = document.createElement("figure");
+            var cellImg = document.createElement("img");
+            cellImg.src = img.currentSrc || img.src;
+            cellImg.alt = "Some Sketches — " + (i + 1) + " of " + imgs.length;
+            cellImg.loading = "lazy";
+            cell.appendChild(cellImg);
+            lbGrid.appendChild(cell);
+          });
+        }
+
+        function applySingleFigure(fig) {
+          if (lbGrid) {
+            lbGrid.hidden = true;
+            lbGrid.innerHTML = "";
+          }
+          lbImg.hidden = false;
+          var imgEl = fig.querySelector("img");
+          lbImg.src = imgEl.currentSrc || imgEl.src;
+          lbImg.alt = imgEl.getAttribute("alt") || "";
+          lbCap.innerHTML = captionHTML(fig);
+        }
+
+        function openLightbox(index) {
+          if (!cards.length) return;
+          var navId = ++lbNavGen;
+
+          var wasOpen = lb.classList.contains("is-open");
+          var prevIdx = lbIdx;
+          var prevHadSingle =
+            wasOpen &&
+            lbImg &&
+            !lbImg.hidden &&
+            lbGrid &&
+            lbGrid.hidden &&
+            !cards[prevIdx].classList.contains("sketch-carousel");
+
+          lbIdx = (index + cards.length) % cards.length;
+          var fig = cards[lbIdx];
+          var isSketchSet = fig.classList.contains("sketch-carousel");
+
+          var shouldDissolve =
+            !lbReduceMotion.matches &&
+            prevHadSingle &&
+            !isSketchSet &&
+            prevIdx !== lbIdx &&
+            wasOpen;
+
+          if (pausedSketchCarousel && pausedSketchCarousel !== fig && typeof pausedSketchCarousel._sketchResume === "function") {
+            pausedSketchCarousel._sketchResume();
+            pausedSketchCarousel = null;
+          }
+
+          if (isSketchSet) {
+            lbImg.style.opacity = "";
+            lbImg.removeAttribute("src");
+            lbImg.hidden = true;
+            if (lbGrid) {
+              lbGrid.hidden = false;
+              renderSketchGrid(fig);
+            }
+            if (typeof fig._sketchPause === "function") {
+              fig._sketchPause();
+              pausedSketchCarousel = fig;
+            }
+            lbCap.innerHTML = captionHTML(fig);
+          } else {
+            function revealLoaded() {
+              if (navId !== lbNavGen) return;
+              requestAnimationFrame(function () {
+                if (navId !== lbNavGen) return;
+                lbImg.style.opacity = "1";
+              });
+            }
+            function afterFadeOut() {
+              if (navId !== lbNavGen) return;
+              applySingleFigure(fig);
+              if (lbImg.complete && lbImg.naturalWidth) {
+                revealLoaded();
+              } else {
+                lbImg.addEventListener("load", revealLoaded, { once: true });
+                lbImg.addEventListener("error", revealLoaded, { once: true });
+              }
+            }
+            if (shouldDissolve) {
+              var dissolveDone = false;
+              var dissolveMs = 340;
+              var fallbackTimer = setTimeout(function () {
+                if (dissolveDone || navId !== lbNavGen) return;
+                dissolveDone = true;
+                afterFadeOut();
+              }, dissolveMs);
+              function onFadeOut(e) {
+                if (e.propertyName !== "opacity") return;
+                if (navId !== lbNavGen) return;
+                if (dissolveDone) return;
+                dissolveDone = true;
+                clearTimeout(fallbackTimer);
+                lbImg.removeEventListener("transitionend", onFadeOut);
+                afterFadeOut();
+              }
+              lbImg.addEventListener("transitionend", onFadeOut);
+              lbImg.style.opacity = "0";
+            } else {
+              applySingleFigure(fig);
+              if (!wasOpen) {
+                lbImg.style.opacity = "0";
+                requestAnimationFrame(function () {
+                  requestAnimationFrame(function () {
+                    if (navId !== lbNavGen) return;
+                    lbImg.style.opacity = "1";
+                  });
+                });
+              } else {
+                lbImg.style.opacity = "1";
+              }
+            }
+          }
+
+          lb.hidden = false;
+          lb.classList.add("is-open");
+          document.body.classList.add("lightbox-open");
+          lb.focus({ preventScroll: true });
+        }
+
+        function closeLightbox() {
+          lbNavGen += 1;
+          lb.classList.remove("is-open");
+          document.body.classList.remove("lightbox-open");
+          lb.hidden = true;
+          lbImg.removeAttribute("src");
+          lbImg.style.opacity = "";
+          if (lbGrid) {
+            lbGrid.innerHTML = "";
+            lbGrid.hidden = true;
+          }
+          if (pausedSketchCarousel && typeof pausedSketchCarousel._sketchResume === "function") {
+            pausedSketchCarousel._sketchResume();
+          }
+          pausedSketchCarousel = null;
+        }
+
+        cards.forEach(function (fig, i) {
+          fig.addEventListener("click", function () {
+            openLightbox(i);
+          });
+          fig.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openLightbox(i);
+            }
+          });
+          fig.setAttribute("tabindex", "0");
+          fig.setAttribute("role", "button");
+        });
+
+        document.querySelectorAll(".sketch-carousel").forEach(function (carousel) {
+          var slides = Array.prototype.slice.call(carousel.querySelectorAll(".sketch-slide"));
+          if (!slides.length) return;
+          var idx = 0;
+          var timerId = null;
+          var INTERVAL_MS = 4800;
+
+          function showSlide(n) {
+            idx = (n + slides.length) % slides.length;
+            slides.forEach(function (slide, i) {
+              slide.classList.toggle("is-active", i === idx);
+            });
+          }
+
+          function tick() {
+            showSlide(idx + 1);
+          }
+
+          function startAutoplay() {
+            stopAutoplay();
+            timerId = setInterval(tick, INTERVAL_MS);
+          }
+
+          function stopAutoplay() {
+            if (timerId) {
+              clearInterval(timerId);
+              timerId = null;
+            }
+          }
+
+          carousel._sketchPause = stopAutoplay;
+          carousel._sketchResume = startAutoplay;
+
+          startAutoplay();
+        });
+
+        document.addEventListener("visibilitychange", function () {
+          document.querySelectorAll(".sketch-carousel").forEach(function (c) {
+            if (document.hidden) {
+              if (typeof c._sketchPause === "function") c._sketchPause();
+            } else {
+              if (typeof c._sketchResume === "function") c._sketchResume();
+            }
+          });
+        });
+
+        lbPrev.addEventListener("click", function (e) {
+          e.stopPropagation();
+          openLightbox(lbIdx - 1);
+        });
+        lbNext.addEventListener("click", function (e) {
+          e.stopPropagation();
+          openLightbox(lbIdx + 1);
+        });
+        lb.querySelectorAll("[data-close-lightbox]").forEach(function (el) {
+          el.addEventListener("click", closeLightbox);
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (!lb.classList.contains("is-open")) return;
+          if (e.key === "Escape") closeLightbox();
+          if (e.key === "ArrowLeft") openLightbox(lbIdx - 1);
+          if (e.key === "ArrowRight") openLightbox(lbIdx + 1);
+        });
+
+        lb.addEventListener("click", function (e) {
+          if (e.target === lb) closeLightbox();
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

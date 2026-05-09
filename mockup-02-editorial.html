@@ -472,6 +472,13 @@
       width: auto;
       height: auto;
       object-fit: contain;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox__img {
+        transition: none;
+      }
     }
     .lightbox__grid {
       pointer-events: auto;
@@ -1500,6 +1507,8 @@
             return fig.querySelector("img");
           });
         var lbIdx = 0;
+        var lbNavGen = 0;
+        var lbReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
         function captionHTML(fig) {
           var title = fig.querySelector(".title");
@@ -1527,16 +1536,50 @@
           });
         }
 
+        function applySingleFigure(fig) {
+          if (lbGrid) {
+            lbGrid.hidden = true;
+            lbGrid.innerHTML = "";
+          }
+          lbImg.hidden = false;
+          var imgEl = fig.querySelector("img");
+          lbImg.src = imgEl.currentSrc || imgEl.src;
+          lbImg.alt = imgEl.getAttribute("alt") || "";
+          lbCap.innerHTML = captionHTML(fig);
+        }
+
         function openLightbox(index) {
           if (!cards.length) return;
+          var navId = ++lbNavGen;
+
+          var wasOpen = lb.classList.contains("is-open");
+          var prevIdx = lbIdx;
+          var prevHadSingle =
+            wasOpen &&
+            lbImg &&
+            !lbImg.hidden &&
+            lbGrid &&
+            lbGrid.hidden &&
+            !cards[prevIdx].classList.contains("sketch-carousel");
+
           lbIdx = (index + cards.length) % cards.length;
           var fig = cards[lbIdx];
           var isSketchSet = fig.classList.contains("sketch-carousel");
+
+          var shouldDissolve =
+            !lbReduceMotion.matches &&
+            prevHadSingle &&
+            !isSketchSet &&
+            prevIdx !== lbIdx &&
+            wasOpen;
+
           if (pausedSketchCarousel && pausedSketchCarousel !== fig && typeof pausedSketchCarousel._sketchResume === "function") {
             pausedSketchCarousel._sketchResume();
             pausedSketchCarousel = null;
           }
+
           if (isSketchSet) {
+            lbImg.style.opacity = "";
             lbImg.removeAttribute("src");
             lbImg.hidden = true;
             if (lbGrid) {
@@ -1547,17 +1590,60 @@
               fig._sketchPause();
               pausedSketchCarousel = fig;
             }
+            lbCap.innerHTML = captionHTML(fig);
           } else {
-            if (lbGrid) {
-              lbGrid.hidden = true;
-              lbGrid.innerHTML = "";
+            function revealLoaded() {
+              if (navId !== lbNavGen) return;
+              requestAnimationFrame(function () {
+                if (navId !== lbNavGen) return;
+                lbImg.style.opacity = "1";
+              });
             }
-            lbImg.hidden = false;
-            var imgEl = fig.querySelector("img");
-            lbImg.src = imgEl.currentSrc || imgEl.src;
-            lbImg.alt = imgEl.getAttribute("alt") || "";
+            function afterFadeOut() {
+              if (navId !== lbNavGen) return;
+              applySingleFigure(fig);
+              if (lbImg.complete && lbImg.naturalWidth) {
+                revealLoaded();
+              } else {
+                lbImg.addEventListener("load", revealLoaded, { once: true });
+                lbImg.addEventListener("error", revealLoaded, { once: true });
+              }
+            }
+            if (shouldDissolve) {
+              var dissolveDone = false;
+              var dissolveMs = 340;
+              var fallbackTimer = setTimeout(function () {
+                if (dissolveDone || navId !== lbNavGen) return;
+                dissolveDone = true;
+                afterFadeOut();
+              }, dissolveMs);
+              function onFadeOut(e) {
+                if (e.propertyName !== "opacity") return;
+                if (navId !== lbNavGen) return;
+                if (dissolveDone) return;
+                dissolveDone = true;
+                clearTimeout(fallbackTimer);
+                lbImg.removeEventListener("transitionend", onFadeOut);
+                afterFadeOut();
+              }
+              lbImg.addEventListener("transitionend", onFadeOut);
+              lbImg.style.opacity = "0";
+            } else {
+              applySingleFigure(fig);
+              if (!wasOpen) {
+                lbImg.style.opacity = "0";
+                requestAnimationFrame(function () {
+                  requestAnimationFrame(function () {
+                    if (navId !== lbNavGen) return;
+                    lbImg.style.opacity = "1";
+                  });
+                });
+              } else {
+                lbImg.style.opacity = "1";
+              }
+            }
           }
-          lbCap.innerHTML = captionHTML(fig);
+
           lb.hidden = false;
           lb.classList.add("is-open");
           document.body.classList.add("lightbox-open");
@@ -1565,10 +1651,12 @@
         }
 
         function closeLightbox() {
+          lbNavGen += 1;
           lb.classList.remove("is-open");
           document.body.classList.remove("lightbox-open");
           lb.hidden = true;
           lbImg.removeAttribute("src");
+          lbImg.style.opacity = "";
           if (lbGrid) {
             lbGrid.innerHTML = "";
             lbGrid.hidden = true;
