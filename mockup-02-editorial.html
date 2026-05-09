@@ -16,13 +16,17 @@
       --cap-size: 0.95rem;
       --caption-meta-size: 0.78rem;
       --rule: #e8e8e8;
-      --max: 1180px;
+      /* 넓은 화면에서도 꽉 차게: 캡을 키우고 좌우 패딩을 vw 기반으로 가변화 */
+      --max: 1680px;
       --chapter-year-size: clamp(2rem, 5vw, 3rem);
       --chapter-pad-top: 3.5rem;
-      --chapter-pad-x: 1.5rem;
-      --chapter-col-gap: clamp(1.1rem, 3vw, 2rem);
+      --chapter-pad-x: clamp(1.5rem, 4vw, 4rem);
+      --chapter-col-gap: clamp(1.1rem, 3vw, 2.5rem);
       /* 가로 스티키 GNB 아래에 연도 라벨 붙이기 (브랜드 제거 후 헤더 높이 반영) */
       --topbar-sticky-offset: clamp(3.25rem, 9vh, 4.75rem);
+      /* 앵커 이동(#y*, #note, #cv): 챕터 padding-top만큼 위로 보정해
+         연도/Artist Note 라벨이 sticky로 고정되는 그 지점에 정확히 정렬 */
+      --anchor-scroll-margin: calc(var(--topbar-sticky-offset) - var(--chapter-pad-top));
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -33,6 +37,35 @@
       color: var(--ink);
       background: var(--paper);
       -webkit-font-smoothing: antialiased;
+    }
+
+    /* 미니멀한 슬림 스크롤바 (Firefox & WebKit) */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(17, 17, 17, 0.22) transparent;
+    }
+    *::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    *::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    *::-webkit-scrollbar-thumb {
+      background-color: rgba(17, 17, 17, 0.18);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      transition: background-color 0.2s ease;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(17, 17, 17, 0.4);
+    }
+    *::-webkit-scrollbar-thumb:active {
+      background-color: rgba(17, 17, 17, 0.55);
+    }
+    *::-webkit-scrollbar-corner {
+      background: transparent;
     }
     .layout__main {
       min-width: 0;
@@ -50,7 +83,6 @@
       top: 0;
       z-index: 30;
       background: rgba(255, 255, 255, 0.96);
-      border-bottom: 1px solid #000000;
       backdrop-filter: blur(10px);
     }
     .topbar__inner {
@@ -64,25 +96,6 @@
       justify-content: flex-start;
       gap: 0.75rem 1rem;
       box-sizing: border-box;
-    }
-    /* 네비 링크와 동일 · 작게 한 줄 */
-    .topbar__logo {
-      font-family: "Inter", system-ui, sans-serif;
-      font-size: var(--cap-size);
-      font-weight: 600;
-      letter-spacing: 0;
-      line-height: 1.25;
-      text-transform: lowercase;
-      white-space: nowrap;
-      color: #000000;
-      text-decoration: none;
-      flex-shrink: 0;
-      opacity: 1;
-      order: 0;
-    }
-    .topbar__logo:hover {
-      text-decoration: none;
-      opacity: 1;
     }
     .topbar__trailing {
       display: flex;
@@ -139,7 +152,6 @@
       font-size: var(--cap-size);
       font-weight: 400;
       letter-spacing: 0;
-      text-transform: lowercase;
       flex: 1;
       min-width: 0;
       order: 2;
@@ -150,8 +162,10 @@
       font-weight: 400;
       text-shadow: none;
       white-space: nowrap;
+      display: inline-block;
+      text-align: center;
     }
-    /* 숨은 볼드 레이아웃: 폭은 항상 700 기준으로 잡아 호버 시 옆 링크가 덜 움직임 */
+    /* 숨은 볼드 레이아웃: 폭은 항상 700 기준으로 잡아 호버 시 너비 변화 없음 */
     .nav a::before {
       content: attr(data-nav-label);
       display: block;
@@ -194,9 +208,6 @@
       .topbar__menu-toggle {
         display: inline-flex;
       }
-      .topbar__logo {
-        order: 0;
-      }
       .topbar__trailing {
         order: 1;
         margin-left: auto;
@@ -233,9 +244,6 @@
       .topbar__menu-toggle {
         display: none !important;
       }
-      .topbar__logo {
-        order: 0;
-      }
       .nav {
         display: flex !important;
         flex-direction: row;
@@ -256,6 +264,19 @@
       }
     }
 
+    .chapter.chapter--intro-only {
+      display: block;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: var(--chapter-pad-top) var(--chapter-pad-x) 0;
+    }
+    .chapter.chapter--intro-only .chapter__intro-band {
+      margin-bottom: 0;
+    }
+    .chapter.chapter--intro-only + .chapter {
+      padding-top: 1.5rem;
+    }
+
     .chapter {
       max-width: var(--max);
       margin: 0 auto;
@@ -273,6 +294,12 @@
         row-gap: 1.5rem;
       }
     }
+    @media (min-width: 1280px) {
+      .chapter {
+        /* 큰 모니터에서 본문이 넓어지는 만큼 연도 레일도 비례 확장 */
+        grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+      }
+    }
     .chapter.chapter--note,
     .chapter.chapter--cv-block {
       padding-top: calc(var(--chapter-pad-top) + clamp(0.85rem, 2.5vw, 1.75rem));
@@ -288,20 +315,42 @@
       display: block;
       min-width: 0;
     }
-    /* 연도(.chapter__year)와 동일 타이포 · 소문자 한 줄 */
+    /* 인트로 큰 타이틀 → 스크롤로 화면에서 사라지면 topbar에 작은 로고만 표시 */
     .chapter__site-title {
       font-family: "Inter", system-ui, sans-serif;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .chapter__site-title:hover { text-decoration: none; }
+    .chapter__site-title--hero {
+      display: block;
       font-size: var(--chapter-year-size);
       font-weight: 700;
       letter-spacing: -0.03em;
-      font-variant-numeric: tabular-nums;
-      line-height: 0.95;
-      text-transform: lowercase;
-      white-space: nowrap;
-      color: var(--ink);
+      line-height: 1;
+      margin: 0 0 3rem;
       max-width: 100%;
-      cursor: default;
-      user-select: text;
+    }
+    .chapter__site-title--topbar {
+      flex-shrink: 0;
+      order: 0;
+      align-self: center;
+      font-size: var(--cap-size);
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.25;
+      white-space: nowrap;
+      vertical-align: middle;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+    }
+    .topbar.show-compact-brand .chapter__site-title--topbar {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 0.35s ease, visibility 0s linear 0s;
     }
     /* CV 본문(.cv-card li)과 동일 타이포 */
     .chapter__intro-bio {
@@ -355,12 +404,18 @@
     }
     .mag-grid {
       display: grid;
-      gap: 0.85rem;
+      column-gap: clamp(0.5rem, 0.9vw, 0.85rem);
+      row-gap: clamp(2.35rem, 4vw, 3.25rem);
       grid-template-columns: 1fr;
     }
     @media (min-width: 640px) {
       .mag-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 1400px) {
+      .mag-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
     .mag-grid--spaced { margin-top: 1rem; }
@@ -405,17 +460,21 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: min(92vw, 1100px);
+      width: 100%;
+      max-width: min(92vw, 1280px);
       max-height: calc(100vh - 6rem);
       pointer-events: none;
     }
-    .lightbox__inner img {
+    .lightbox__img {
       pointer-events: auto;
       max-width: 100%;
       max-height: calc(100vh - 11rem);
       width: auto;
       height: auto;
       object-fit: contain;
+    }
+    .lightbox__grid {
+      pointer-events: auto;
     }
     .lightbox__caption {
       margin-top: 1.25rem;
@@ -441,33 +500,65 @@
       position: absolute;
       z-index: 2;
       top: 50%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      border: 1px solid #000000;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.95);
+      width: 52px;
+      height: 52px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
       color: #000000;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
+      opacity: 0.55;
+      transition: opacity 0.18s ease, background 0.2s ease, transform 0.25s ease;
     }
-    .lightbox__btn:hover {
-      background: #ffffff;
-      border-color: #000000;
-      color: #000000;
+    .lightbox__btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .lightbox__btn:hover,
+    .lightbox__btn:focus-visible {
+      opacity: 1;
+    }
+    .lightbox__btn:hover::before,
+    .lightbox__btn:focus-visible::before {
+      opacity: 1;
+    }
+    .lightbox__btn:focus {
+      outline: none;
     }
     .lightbox__btn:focus-visible {
-      outline: 2px solid #000000;
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: 0 0 0 2px #000000;
     }
-    .lightbox__prev { left: max(1rem, env(safe-area-inset-left)); }
-    .lightbox__next { right: max(1rem, env(safe-area-inset-right)); }
+    .lightbox:focus { outline: none; }
+    .lightbox__btn:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+    .lightbox__prev {
+      left: max(1.25rem, env(safe-area-inset-left));
+      transform: translate(0, -50%);
+    }
+    .lightbox__next {
+      right: max(1.25rem, env(safe-area-inset-right));
+      transform: translate(0, -50%);
+    }
+    .lightbox__prev:hover { transform: translate(-3px, -50%); }
+    .lightbox__next:hover { transform: translate(3px, -50%); }
     .lightbox__btn svg {
-      width: 20px;
-      height: 20px;
+      position: relative;
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.5;
     }
     body.lightbox-open {
       overflow: hidden;
@@ -477,33 +568,124 @@
         padding: 3.5rem 0.75rem;
       }
       .lightbox__btn {
-        width: 38px;
-        height: 38px;
+        width: 44px;
+        height: 44px;
       }
-      .lightbox__prev { left: 0.35rem; }
-      .lightbox__next { right: 0.35rem; }
+      .lightbox__btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .lightbox__prev { left: 0.5rem; }
+      .lightbox__next { right: 0.5rem; }
+      .lightbox__prev:hover { transform: translate(-2px, -50%); }
+      .lightbox__next:hover { transform: translate(2px, -50%); }
     }
     figure.mag .frame {
-      background: #f4f4f4;
-      overflow: hidden;
+      background: transparent;
       width: 100%;
     }
     figure.mag .frame img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
       vertical-align: middle;
     }
-    figure.mag.portrait .frame { aspect-ratio: 3 / 4; }
-    figure.mag.square .frame { aspect-ratio: 1 / 1; }
-    figure.mag.landscape .frame { aspect-ratio: 5 / 4; }
 
     figure.mag.span2 {
       grid-column: 1 / -1;
     }
     @media (min-width: 640px) {
-      figure.mag.span2 .frame { aspect-ratio: 21 / 9; max-height: 420px; }
+      figure.mag.span2 .frame {
+        max-width: min(100%, 880px);
+        margin: 0 auto;
+      }
+    }
+    @media (min-width: 1400px) {
+      /* 3단 그리드에서 span2는 2칸을 차지(전체 폭이 아니라) */
+      figure.mag.span2 {
+        grid-column: span 2;
+      }
+    }
+
+    /* 스케치 시리즈: 자동 디졸브(페이드) */
+    figure.mag.sketch-carousel { cursor: pointer; }
+    .sketch-frame {
+      position: relative;
+      background: #f0f0f0;
+      aspect-ratio: 600 / 820;
+      overflow: hidden;
+      border-radius: 2px;
+    }
+    .sketch-stage {
+      position: absolute;
+      inset: 0;
+    }
+    .sketch-slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: #f0f0f0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.32s ease-in-out;
+    }
+    .sketch-slide.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .sketch-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* 라이트박스 안의 6장 그리드(Some Sketches 전용 뷰) */
+    .lightbox__grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.25rem, 0.45vw, 0.45rem);
+      width: min(92vw, 1280px);
+      height: calc(100vh - 11rem);
+      max-height: 100%;
+    }
+    .lightbox__grid figure {
+      margin: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .lightbox__grid img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    @media (max-width: 720px) {
+      .lightbox__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        height: calc(100vh - 10rem);
+      }
+    }
+    @media (max-width: 420px) {
+      .lightbox__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 0.25rem;
+      }
     }
 
     figure.mag figcaption {
@@ -536,7 +718,6 @@
       font-size: 0.9rem;
       font-weight: 600;
       letter-spacing: 0.02em;
-      text-transform: lowercase;
       color: #000000;
       margin-bottom: 0.75rem;
       padding-bottom: 0.35rem;
@@ -554,10 +735,11 @@
     }
 
     footer.site-ft {
+      position: relative;
       max-width: var(--max);
       margin: 0 auto;
-      padding: 2rem 1.5rem 3rem;
-      border-top: 1px solid #000000;
+      padding: 2rem var(--chapter-pad-x) 3rem;
+      border-top: none;
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -565,47 +747,113 @@
       font-size: var(--cap-size);
       color: var(--muted);
     }
+    /* 탑바(.topbar__inner)와 동일 좌우 패딩(chapter-pad-x)으로 이메일 ↔ Whee 정렬 */
+    footer.site-ft::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 100vw;
+      height: 1px;
+      background: #000000;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
     footer.site-ft a {
       color: var(--ink);
       font-weight: 500;
     }
 
-    /* 앵커 점프 시 상단 스티키 GNB에 가리지 않도록 */
-    .chapter[id^="y"],
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: clamp(1.25rem, 4vh, 2rem);
+      transform: translate(-50%, 12px);
+      z-index: 400;
+      padding: 0.7rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.92);
+      color: #ffffff;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+      line-height: 1.2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.25s ease;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    }
+    .toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .toast { transition: opacity 0.2s ease; transform: translate(-50%, 0); }
+    }
+
+    /* 앵커 점프 시 상단 스티키 GNB에 가리지 않도록 — 라벨이 sticky 위치에 딱 맞도록 보정 */
+    .chapter[id^="y"] {
+      scroll-margin-top: var(--anchor-scroll-margin);
+    }
+    /* 첫 연도 챕터(인트로 직후)는 padding-top: 1.5rem 으로 더 작음 → 보정값도 그에 맞게 */
+    .chapter.chapter--intro-only + .chapter[id^="y"] {
+      scroll-margin-top: calc(var(--topbar-sticky-offset) - 1.5rem);
+    }
+    /* Artist Note / CV는 챕터 padding-top이 더 큼(--chapter-pad-top + 추가분) → 같은 양만큼 더 빼줌 */
     #note,
     #cv {
-      scroll-margin-top: var(--topbar-sticky-offset);
+      scroll-margin-top: calc(var(--anchor-scroll-margin) - clamp(0.85rem, 2.5vw, 1.75rem));
     }
     /* 연도 라벨과 동일 타이포 · 좌측 작은 열에 두며 배경 없음 */
     .chapter__year--section {
-      text-transform: lowercase;
       font-variant-numeric: normal;
       white-space: normal;
       background: transparent;
       padding-right: 0;
       padding-bottom: 0.35rem;
     }
+    @media (max-width: 719px) {
+      .chapter__year--section br { display: none; }
+    }
     #cv .chapter__year--section {
       line-height: 0.92;
     }
     .chapter--note .note-photo {
-      background: #f4f4f4;
-      aspect-ratio: 5 / 4;
-      overflow: hidden;
-      margin-bottom: 2rem;
-      max-width: min(100%, 42rem);
+      margin-bottom: 1.5rem;
+      max-width: 100%;
     }
     .chapter--note .note-photo img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
       display: block;
+    }
+    .chapter--note .note-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 720px) {
+      .chapter--note .note-layout {
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        column-gap: clamp(1.5rem, 3vw, 2.5rem);
+        align-items: start;
+      }
+      .chapter--note .note-photo {
+        position: sticky;
+        top: var(--topbar-sticky-offset);
+        margin-bottom: 0;
+      }
     }
     .chapter--note .note-block p {
       font-size: var(--cap-size);
       font-weight: 400;
       color: var(--ink);
       line-height: 1.65;
+      /* 자연스러운 줄바꿈: 한글은 어절 단위로 끊기고(영문도 단어 중간 분리 안 함),
+         지원 브라우저에선 줄 균형까지 맞춰 'nature, but' 같은 어색한 끊김 방지 */
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-wrap: pretty;
+      hanging-punctuation: first allow-end last;
     }
     .chapter--note .note-block p + p {
       margin-top: 0.9em;
@@ -621,16 +869,17 @@
 <body id="top">
   <header class="topbar">
     <div class="topbar__inner">
-      <a class="topbar__logo" href="mockup-02-editorial.html#top">whee studio</a>
+      <a class="chapter__site-title chapter__site-title--topbar" href="#top" aria-label="Whee — 처음으로" aria-hidden="true" tabindex="-1">Whee</a>
       <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+        <a href="#y2025" data-nav-label="2025">2025</a>
         <a href="#y2024" data-nav-label="2024">2024</a>
         <a href="#y2023" data-nav-label="2023">2023</a>
         <a href="#y2021" data-nav-label="2021">2021</a>
         <a href="#y2020" data-nav-label="2020">2020</a>
         <a href="#y2019" data-nav-label="2019">2019</a>
         <a href="#y2018" data-nav-label="2018">2018</a>
-        <a href="#note" data-nav-label="artist note">artist note</a>
-        <a href="#cv" data-nav-label="cv">cv</a>
+        <a href="#note" data-nav-label="Artist Note">Artist Note</a>
+        <a href="#cv" data-nav-label="CV">CV</a>
       </nav>
       <div class="topbar__trailing">
         <button type="button" class="topbar__menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="메뉴 열기">
@@ -641,7 +890,7 @@
           </span>
         </button>
         <a class="topbar__ig" href="https://www.instagram.com/whee_studio/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
             <circle cx="12" cy="12" r="4" />
             <circle cx="17.5" cy="6.5" r="1.25" fill="currentColor" stroke="none" />
@@ -652,21 +901,79 @@
   </header>
 
   <div class="layout__main">
-  <article class="chapter" id="y2024">
+  <div class="chapter chapter--intro-only">
     <div class="chapter__intro-band">
-      <span class="chapter__site-title">whee studio</span>
+      <h1 class="chapter__site-title chapter__site-title--hero">Whee</h1>
       <p class="chapter__intro-bio">1984 Born in Seoul, Korea. Lives and works in Seoul and Manila.</p>
       <p class="chapter__intro-mail">
         <button type="button" class="chapter__mail-btn" aria-label="이메일 주소 복사" title="woni.cha@gmail.com">woni.cha@gmail.com</button>
       </p>
     </div>
+  </div>
+
+  <article class="chapter" id="y2025">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2025</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Silent%20Scream%20%202025%20Oil%2C%20charcoal%2C%20oil%20crayon%20and%20oil%20paint%20on%20canvas%20%20120%20x%20132%20cm.jpg" alt="Silent Scream" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream</span>
+            <span class="meta-line">Oil, charcoal, oil crayon and oil paint on canvas</span>
+            <span class="meta-line">120 × 132 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Silent%20Scream%20II%20%202025%20Soft%20pastel%2C%20charcoal%2C%20oil%20pastel%20and%20oil%20paint%20on%20canvas%20%20135.6%20x%20169.5%20cm.jpg" alt="Silent Scream II" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream II</span>
+            <span class="meta-line">Soft pastel, charcoal, oil pastel and oil paint on canvas</span>
+            <span class="meta-line">135.6 × 169.5 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20III%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20176.5%20x%20140.3%20cm%20.jpeg" alt="Silent Scream III" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream III</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">176.5 × 140.3 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png" alt="Silent Scream IV" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream IV</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">196 × 140 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Untitled%20%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20%2043.15%20x%2048.25%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">43.15 × 48.25 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <article class="chapter" id="y2024">
     <div class="chapter__year-rail">
       <div class="chapter__year">2024</div>
     </div>
     <div class="chapter__body">
       <div class="mag-grid">
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-02.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee24a/800/1067" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Garden%20of%20Birds%20of%20Paradise%20%202024%20Acrylic%20and%20oil%20on%20canvas%20122%20x%2091.4%20cm.jpg" alt="Garden of Birds of Paradise" loading="lazy" /></div>
           <figcaption>
             <span class="title">Garden of Birds of Paradise</span>
             <span class="meta-line">Acrylic and oil on canvas</span>
@@ -674,8 +981,17 @@
             <span class="meta-line">2024</span>
           </figcaption>
         </figure>
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-03.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee24b/800/1067" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/I%20Was%20Lost%20but%20Now%20I%20Am%20Found%20%202024%20Acrylic%20and%20oil%20on%20canvas%20%20169%20x%20118%20cm.jpg" alt="I Was Lost but Now I Am Found" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">I Was Lost but Now I Am Found</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202024%20Oil%20on%20canvas%20169%20x%20118%20cm.jpg" alt="Untitled" loading="lazy" /></div>
           <figcaption>
             <span class="title">Untitled</span>
             <span class="meta-line">Oil on canvas</span>
@@ -683,12 +999,19 @@
             <span class="meta-line">2024</span>
           </figcaption>
         </figure>
-        <figure class="mag span2 landscape">
-          <div class="frame"><img src="assets/work-04.jpg" alt="" width="1400" height="600" loading="lazy" data-fallback="https://picsum.photos/seed/whee24wide/1400/600" /></div>
+        <figure class="mag sketch-carousel" data-sketch-count="6">
+          <div class="frame sketch-frame">
+            <div class="sketch-stage" aria-live="polite" aria-label="Some Sketches — automatic slideshow">
+              <div class="sketch-slide is-active"><img src="assets/Some%20Sketches%201.png" alt="Some Sketches — 1 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%202.jpg" alt="Some Sketches — 2 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%203.jpg" alt="Some Sketches — 3 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%204.jpg" alt="Some Sketches — 4 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%205.jpg" alt="Some Sketches — 5 of 6" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%206.jpg" alt="Some Sketches — 6 of 6" loading="lazy" /></div>
+            </div>
+          </div>
           <figcaption>
-            <span class="title">Silent Scream</span>
-            <span class="meta-line">Charcoal, pastel, oil crayon, and oil on canvas</span>
-            <span class="meta-line">120 × 132 cm</span>
+            <span class="title">Some Sketches</span>
             <span class="meta-line">2024</span>
           </figcaption>
         </figure>
@@ -702,21 +1025,66 @@
     </div>
     <div>
       <div class="mag-grid mag-grid--spaced">
-        <figure class="mag square">
-          <div class="frame"><img src="assets/work-05.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee23sq/900/900" /></div>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/A%20Study%20for%20Nature%20%202023%20Watercolor%20and%20acrylic%20on%20paper%20111%20x%20147%20cm.png" alt="A Study for Nature" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Silent Scream III</span>
-            <span class="meta-line">Charcoal, pastel, oil stick, and oil on canvas</span>
-            <span class="meta-line">176.5 × 140.3 cm</span>
+            <span class="title">A Study for Nature</span>
+            <span class="meta-line">Watercolor and acrylic on paper</span>
+            <span class="meta-line">111 × 147 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-06.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee23t/800/1067" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/All%20of%20Me%20Wants%20All%20of%20You%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20182%20x%20142%20cm.png" alt="All of Me Wants All of You" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Silent Scream II</span>
-            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
-            <span class="meta-line">135.6 × 169.5 cm</span>
+            <span class="title">All of Me Wants All of You</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">182 × 142 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Breathe%20In%20and%20Breathe%20Out%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20102%20x%2080%20cm.png" alt="Breathe In and Breathe Out" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Breathe In and Breathe Out</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">102 × 80 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Frozen%20%202023%20Acrylic%20on%20canvas%20163%20x%20130%20cm.png" alt="Frozen" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Frozen</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">163 × 130 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Starry%20Night%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20122%20x%20122%20cm.png" alt="Starry Night" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Starry Night</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">122 × 122 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%20on%20canvas%20%20164%20x%20135%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">164 × 135 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%2C%20watercolor%20and%20acrylic%20on%20canvas%20%20135%20x%20112%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil, watercolor and acrylic on canvas</span>
+            <span class="meta-line">135 × 112 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
@@ -730,30 +1098,30 @@
     </div>
     <div>
       <div class="mag-grid">
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-07.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee21a/800/1067" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Juju%20Eyeballs%20%202021%20Oil%20on%20canvas%20145%20x%20112%20cm.png" alt="Juju Eyeballs" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Silent Scream IV</span>
-            <span class="meta-line">Charcoal, pastel, oil stick, and oil on canvas</span>
-            <span class="meta-line">196 × 140 cm</span>
+            <span class="title">Juju Eyeballs</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">145 × 112 cm</span>
+            <span class="meta-line">2021</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Yummy%20%202021%20Acrylic%20on%20canvas%20160%20x%20119%20cm.png" alt="Yummy" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Yummy</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">160 × 119 cm</span>
             <span class="meta-line">2021</span>
           </figcaption>
         </figure>
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-08.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee21b/800/1067" /></div>
+          <div class="frame"><img src="assets/Wild%20Capture%20%202021%20Acrylic%20on%20canvas%20163%20x%20259%20cm.png" alt="Wild Capture" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Untitled</span>
-            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
-            <span class="meta-line">43.18 × 48.25 cm</span>
-            <span class="meta-line">2021</span>
-          </figcaption>
-        </figure>
-        <figure class="mag square">
-          <div class="frame"><img src="assets/work-09.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee21c/900/900" /></div>
-          <figcaption>
-            <span class="title">Some Sketches</span>
-            <span class="meta-line">—</span>
-            <span class="meta-line">—</span>
+            <span class="title">Wild Capture</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">163 × 259 cm</span>
             <span class="meta-line">2021</span>
           </figcaption>
         </figure>
@@ -768,11 +1136,29 @@
     <div>
       <div class="mag-grid">
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-01.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee20a/800/1067" /></div>
+          <div class="frame"><img src="assets/A%20Doll%E2%80%99s%20Dream%20%202020%20Oil%20on%20canvas%2091%20x%20121%20cm.png" alt="A Doll’s Dream" loading="lazy" /></div>
           <figcaption>
-            <span class="title">I Was Lost but Now I Am Found</span>
-            <span class="meta-line">Acrylic and oil on canvas</span>
-            <span class="meta-line">169 × 118 cm</span>
+            <span class="title">A Doll’s Dream</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 121 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/A%20Mirror%20Reflection%20of%20a%20Woman%E2%80%99s%20Back%20%202020%20Oil%20on%20canvas%20145%20x%20112%20cm.png" alt="A Mirror Reflection of a Woman’s Back" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">A Mirror Reflection of a Woman’s Back</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">145 × 112 cm</span>
+            <span class="meta-line">2020</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Nude%20Peach%20at%20Venice%20Beach%20%202020%20Oil%20on%20canvas%20163%20x%20262%20cm.png" alt="Nude Peach at Venice Beach" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Nude Peach at Venice Beach</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">163 × 262 cm</span>
             <span class="meta-line">2020</span>
           </figcaption>
         </figure>
@@ -786,12 +1172,21 @@
     </div>
     <div>
       <div class="mag-grid">
-        <figure class="mag square">
-          <div class="frame"><img src="assets/work-08.jpg" alt="" width="900" height="900" loading="lazy" data-fallback="https://picsum.photos/seed/whee19a/900/900" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Garden%20of%20Edan%20%202019%20Oil%20on%20canvas%20260%20x%20163%20cm.png" alt="Garden of Edan" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Untitled</span>
-            <span class="meta-line">Charcoal, pastel, and oil on canvas</span>
-            <span class="meta-line">43.18 × 48.25 cm</span>
+            <span class="title">Garden of Edan</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">260 × 163 cm</span>
+            <span class="meta-line">2019</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Magic%20Castle%20%202019%20Oil%20on%20canvas%20260%20x%20163%20cm.png" alt="Magic Castle" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Magic Castle</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">260 × 163 cm</span>
             <span class="meta-line">2019</span>
           </figcaption>
         </figure>
@@ -805,12 +1200,39 @@
     </div>
     <div>
       <div class="mag-grid">
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/work-09.jpg" alt="" width="800" height="1067" loading="lazy" data-fallback="https://picsum.photos/seed/whee18a/800/1067" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-1%20%202018%20Oil%20on%20canvas%20160%20x%20180%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-1" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Some Sketches</span>
-            <span class="meta-line">—</span>
-            <span class="meta-line">—</span>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-1</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">160 × 180 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-2%20%202018%20Oil%20on%20canvas%2091%20x%2073%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-2" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-2</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 73 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-3%20%202018%20Oil%20on%20canvas%2091%20x%2073%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-3" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Earth Painting - How We Forget to Appreciate 1-3</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">91 × 73 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Untitled%20%202018%20Oil%20on%20canvas%20129%20x%20161cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">129 × 161 cm</span>
             <span class="meta-line">2018</span>
           </figcaption>
         </figure>
@@ -820,32 +1242,36 @@
 
   <section id="note" class="chapter chapter--note">
     <div class="chapter__year-rail">
-      <div class="chapter__year chapter__year--section">artist&nbsp;note</div>
+      <div class="chapter__year chapter__year--section">Artist Note</div>
     </div>
     <div class="chapter__body">
-      <div class="note-photo">
-        <img src="assets/note.jpg" alt="Woni Cha in the studio" width="900" height="720" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
+      <div class="note-layout">
+        <div class="note-photo">
+          <img src="assets/Artist%20Note.jpg" alt="Woni Cha in the studio" width="1080" height="1509" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
+        </div>
+        <div class="note-text">
+          <section class="note-block" aria-label="Artist note">
+            <p>I see nature not as a landscape, but as a living entity where emotions accumulate and erupt.</p>
+            <p>My work explores how suppressed emotions twist internally and eventually expand into organic forms.</p>
+            <p>The invisible pressures and tensions I experience as a woman are translated into layers of color, movement, density, and fracture on the canvas.</p>
+            <p>Through uncontrolled gestures and accumulated surfaces, I portray emotions not as something that disappears, but as something that transforms and persists.</p>
+            <p>My paintings are not representations of nature, but manifestations of an inner landscape—a self-generated ecology of emotion.</p>
+          </section>
+          <section class="note-block" aria-label="작가 노트">
+            <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
+            <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
+            <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
+            <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해 감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
+            <p>나의 회화는 풍경이 아니라, 감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
+          </section>
+        </div>
       </div>
-      <section class="note-block" aria-label="Artist note">
-        <p>I see nature not as a landscape, but as a living entity where emotions accumulate and erupt.</p>
-        <p>My work explores how suppressed emotions twist internally and eventually expand into organic forms.</p>
-        <p>The invisible pressures and tensions I experience as a woman are translated into layers of color, movement, density, and fracture on the canvas.</p>
-        <p>Through uncontrolled gestures and accumulated surfaces, I portray emotions not as something that disappears, but as something that transforms and persists.</p>
-        <p>My paintings are not representations of nature, but manifestations of an inner landscape—a self-generated ecology of emotion.</p>
-      </section>
-      <section class="note-block" aria-label="작가 노트">
-        <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
-        <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
-        <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
-        <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해 감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
-        <p>나의 회화는 풍경이 아니라, 감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
-      </section>
     </div>
   </section>
 
   <section id="cv" class="chapter chapter--cv-block">
     <div class="chapter__year-rail">
-      <div class="chapter__year chapter__year--section">curriculum<br />vitae</div>
+      <div class="chapter__year chapter__year--section">Curriculum <br />Vitae</div>
     </div>
     <div class="chapter__body">
       <div class="cv-grid">
@@ -857,29 +1283,40 @@
         </ul>
       </div>
       <div class="cv-card">
-        <h4>Solo / Awarded</h4>
+        <h4>Solo Exhibition / Awarded Exhibition</h4>
         <ul>
-          <li>2025 Silent Scream, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
-          <li>2023 Supreme Yard, Leon Gallery, Manila, Philippines</li>
-          <li>2013 Idolic Bonanza, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
-          <li>2011 Spring up! Mentoring Project 2011, Two Person Exhibition, sponsored by the Seoul Foundation of Arts and Culture, Space Can, Seoul, Korea</li>
+          <li>2025 <em>Silent Scream</em>, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
+          <li>2023 <em>Supreme Yard</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2013 <em>Idolic Bonanza</em>, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
+          <li>2011 <em>Spring up! Mentoring Project 2011</em>, Two Person Exhibition - Seoul Foundation of Arts and Culture Sponsored Project, Space Can, Seoul, Korea</li>
         </ul>
       </div>
       <div class="cv-card">
-        <h4>Group exhibition</h4>
+        <h4>Group Exhibition</h4>
         <ul>
-          <li>2024 Wild: Women Abstractionists on Nature, Metropolitan Museum of Manila, Manila, Philippines</li>
-          <li>2023 Gallery Benefit 2023, National Gallery Singapore, Singapore</li>
-          <li>2022 Art Detour II, Leon Gallery, Manila, Philippines</li>
-          <li>2021 From Vivid Color to Image, Manila House, Manila, Philippines</li>
+          <li>2024 <em>Wild: Women Abstractionists on Nature</em>, Metropolitan Museum of Manila, Manila, Philippines</li>
+          <li>2023 <em>Gallery Benefit 2023</em>, National Gallery Singapore, Singapore</li>
+          <li>2022 <em>Art Detour II</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2021 <em>From Vivid Color to Image</em>, Manila House, Manila, Philippines</li>
+          <li>2021 <em>Art Detour</em>, Leon Gallery, Manila, Philippines</li>
+          <li>2020 <em>Women and Time</em>, Assumption College, Manila, Philippines</li>
+          <li>2018 <em>Heritage-Trace: RISD exhibition</em>, L'espass 71 Gallery, Seoul, Korea</li>
+          <li>2017 <em>1968 Contemporary Space 2017</em>, Contemporary Space Association 50 Year Anniversary Exhibition, Kim Jong-young Museum, Seoul, Korea</li>
+          <li>2017 <em>RED: RISD Exhibition</em>, Sophis Gallery, Seoul, Korea</li>
+          <li>2015 <em>Prelude for Twenty Differences</em>, Art Space Flask, Seoul, Korea</li>
+          <li>2012 <em>Exhibition for Outstanding Graduate Students</em>, Seoul National University Museum of Art MOA, Gwanak-gu, Seoul, Korea</li>
         </ul>
       </div>
       <div class="cv-card">
         <h4>Press</h4>
         <ul>
-          <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer">Wild Women</a></li>
-          <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer">Making art dynamic</a></li>
-          <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer">Solo exhibition</a></li>
+          <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer"><em>Wild Women</em></a></li>
+          <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer"><em>Wonhee Delgado embodies the delights of making art dynamic</em></a></li>
+          <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer"><em>León Gallery presents Whee's solo exhibition, showcasing fantasy as a journey to the self</em></a></li>
+          <li>2023 Art Plus — <a href="https://artplus.ph/features/fantasy-and-fusion?format=amp" target="_blank" rel="noopener noreferrer"><em>Fantasy and Fusion</em></a></li>
+          <li>2023 Philstar Life — <a href="https://philstarlife.com/geeky/219297-whee-cha-delgado-vibrant-art?page=3" target="_blank" rel="noopener noreferrer"><em>Whee Cha Delgado's vibrant art</em></a></li>
+          <li>2022 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/making-a-statement-wonhee-delgado" target="_blank" rel="noopener noreferrer"><em>South Korean painter Wonhee Delgado finds her home amid the Manila art scene</em></a></li>
+          <li>2021 Philstar Life — <a href="https://www.philstar.com/lifestyle/fashion-and-beauty/2021/06/30/2108964/art-detour-leon-gallery" target="_blank" rel="noopener noreferrer"><em>'Art Detour' at Leon Gallery</em></a></li>
         </ul>
       </div>
     </div>
@@ -887,11 +1324,13 @@
   </section>
 
   <footer class="site-ft">
-    <a href="mailto:woni.cha@gmail.com">woni.cha@gmail.com</a>
+    <a class="js-mail-copy" href="mailto:woni.cha@gmail.com">woni.cha@gmail.com</a>
   </footer>
   </div>
 
-  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" tabindex="-1" hidden>
     <div class="lightbox__backdrop" data-close-lightbox></div>
     <button type="button" class="lightbox__btn lightbox__prev" aria-label="이전 작품">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
@@ -901,6 +1340,7 @@
     </button>
     <div class="lightbox__inner">
       <img class="lightbox__img" alt="" />
+      <div class="lightbox__grid" hidden></div>
       <div class="lightbox__caption"></div>
     </div>
   </div>
@@ -908,34 +1348,93 @@
   <script>
     (function () {
       var STUDIO_EMAIL = "woni.cha@gmail.com";
+      var toastEl = document.getElementById("toast");
+      var toastTimer = null;
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.add("is-visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove("is-visible");
+        }, 1800);
+      }
+
+      function copyEmail() {
+        function done() { showToast("Email copied to clipboard"); }
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = STUDIO_EMAIL;
+          ta.setAttribute("readonly", "");
+          ta.style.cssText = "position:fixed;left:-9999px;top:0";
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            if (document.execCommand("copy")) done();
+          } catch (e) {}
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(STUDIO_EMAIL).then(done).catch(fallback);
+        } else {
+          fallback();
+        }
+      }
+
       document.querySelectorAll(".chapter__mail-btn").forEach(function (btn) {
         btn.addEventListener("click", function () {
-          var label = btn.getAttribute("aria-label");
-          function done() {
-            btn.setAttribute("aria-label", "복사됨: " + STUDIO_EMAIL);
-            setTimeout(function () {
-              btn.setAttribute("aria-label", label);
-            }, 2000);
-          }
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(STUDIO_EMAIL).then(done).catch(fallback);
-          } else {
-            fallback();
-          }
-          function fallback() {
-            var ta = document.createElement("textarea");
-            ta.value = STUDIO_EMAIL;
-            ta.setAttribute("readonly", "");
-            ta.style.cssText = "position:fixed;left:-9999px;top:0";
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-              if (document.execCommand("copy")) done();
-            } catch (e) {}
-            document.body.removeChild(ta);
-          }
+          copyEmail();
         });
       });
+
+      document.querySelectorAll(".js-mail-copy").forEach(function (link) {
+        link.addEventListener("click", function () {
+          copyEmail();
+        });
+      });
+
+      (function () {
+        var topbarEl = document.querySelector(".topbar");
+        var heroTitle = document.querySelector(".chapter__site-title--hero");
+        var compactBrand = document.querySelector(".chapter__site-title--topbar");
+        if (!topbarEl || !heroTitle) return;
+
+        function setCompactBrand(on) {
+          topbarEl.classList.toggle("show-compact-brand", on);
+          if (compactBrand) {
+            compactBrand.setAttribute("aria-hidden", on ? "false" : "true");
+            compactBrand.setAttribute("tabindex", on ? "0" : "-1");
+          }
+        }
+
+        if (typeof IntersectionObserver === "undefined") {
+          setCompactBrand((window.scrollY || 0) > 120);
+          window.addEventListener(
+            "scroll",
+            function () {
+              var r = heroTitle.getBoundingClientRect();
+              setCompactBrand(r.bottom < 8);
+            },
+            { passive: true }
+          );
+          return;
+        }
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              var heroStillVisible = entry.isIntersecting && entry.intersectionRatio > 0;
+              setCompactBrand(!heroStillVisible);
+            });
+          },
+          {
+            root: null,
+            rootMargin: "-52px 0px 0px 0px",
+            threshold: [0, 0.01, 0.25, 0.5, 1],
+          }
+        );
+        io.observe(heroTitle);
+      })();
 
       (function () {
         var topbarEl = document.querySelector(".topbar");
@@ -985,10 +1484,13 @@
         });
       });
 
-      /* 라이트박스: figure.mag 순서대로 전체 작품 갤러리 */
+      /* 라이트박스 (Some Sketches는 6장 그리드 뷰로 통합) */
       var lb = document.getElementById("lightbox");
+      var pausedSketchCarousel = null;
+
       if (lb) {
         var lbImg = lb.querySelector(".lightbox__img");
+        var lbGrid = lb.querySelector(".lightbox__grid");
         var lbCap = lb.querySelector(".lightbox__caption");
         var lbPrev = lb.querySelector(".lightbox__prev");
         var lbNext = lb.querySelector(".lightbox__next");
@@ -1010,18 +1512,56 @@
           return html;
         }
 
+        function renderSketchGrid(fig) {
+          if (!lbGrid) return;
+          lbGrid.innerHTML = "";
+          var imgs = fig.querySelectorAll(".sketch-slide img");
+          imgs.forEach(function (img, i) {
+            var cell = document.createElement("figure");
+            var cellImg = document.createElement("img");
+            cellImg.src = img.currentSrc || img.src;
+            cellImg.alt = "Some Sketches — " + (i + 1) + " of " + imgs.length;
+            cellImg.loading = "lazy";
+            cell.appendChild(cellImg);
+            lbGrid.appendChild(cell);
+          });
+        }
+
         function openLightbox(index) {
           if (!cards.length) return;
           lbIdx = (index + cards.length) % cards.length;
           var fig = cards[lbIdx];
-          var imgEl = fig.querySelector("img");
-          lbImg.src = imgEl.currentSrc || imgEl.src;
-          lbImg.alt = imgEl.getAttribute("alt") || "";
+          var isSketchSet = fig.classList.contains("sketch-carousel");
+          if (pausedSketchCarousel && pausedSketchCarousel !== fig && typeof pausedSketchCarousel._sketchResume === "function") {
+            pausedSketchCarousel._sketchResume();
+            pausedSketchCarousel = null;
+          }
+          if (isSketchSet) {
+            lbImg.removeAttribute("src");
+            lbImg.hidden = true;
+            if (lbGrid) {
+              lbGrid.hidden = false;
+              renderSketchGrid(fig);
+            }
+            if (typeof fig._sketchPause === "function") {
+              fig._sketchPause();
+              pausedSketchCarousel = fig;
+            }
+          } else {
+            if (lbGrid) {
+              lbGrid.hidden = true;
+              lbGrid.innerHTML = "";
+            }
+            lbImg.hidden = false;
+            var imgEl = fig.querySelector("img");
+            lbImg.src = imgEl.currentSrc || imgEl.src;
+            lbImg.alt = imgEl.getAttribute("alt") || "";
+          }
           lbCap.innerHTML = captionHTML(fig);
           lb.hidden = false;
           lb.classList.add("is-open");
           document.body.classList.add("lightbox-open");
-          lbPrev.focus();
+          lb.focus({ preventScroll: true });
         }
 
         function closeLightbox() {
@@ -1029,6 +1569,14 @@
           document.body.classList.remove("lightbox-open");
           lb.hidden = true;
           lbImg.removeAttribute("src");
+          if (lbGrid) {
+            lbGrid.innerHTML = "";
+            lbGrid.hidden = true;
+          }
+          if (pausedSketchCarousel && typeof pausedSketchCarousel._sketchResume === "function") {
+            pausedSketchCarousel._sketchResume();
+          }
+          pausedSketchCarousel = null;
         }
 
         cards.forEach(function (fig, i) {
@@ -1043,6 +1591,52 @@
           });
           fig.setAttribute("tabindex", "0");
           fig.setAttribute("role", "button");
+        });
+
+        document.querySelectorAll(".sketch-carousel").forEach(function (carousel) {
+          var slides = Array.prototype.slice.call(carousel.querySelectorAll(".sketch-slide"));
+          if (!slides.length) return;
+          var idx = 0;
+          var timerId = null;
+          var INTERVAL_MS = 4800;
+
+          function showSlide(n) {
+            idx = (n + slides.length) % slides.length;
+            slides.forEach(function (slide, i) {
+              slide.classList.toggle("is-active", i === idx);
+            });
+          }
+
+          function tick() {
+            showSlide(idx + 1);
+          }
+
+          function startAutoplay() {
+            stopAutoplay();
+            timerId = setInterval(tick, INTERVAL_MS);
+          }
+
+          function stopAutoplay() {
+            if (timerId) {
+              clearInterval(timerId);
+              timerId = null;
+            }
+          }
+
+          carousel._sketchPause = stopAutoplay;
+          carousel._sketchResume = startAutoplay;
+
+          startAutoplay();
+        });
+
+        document.addEventListener("visibilitychange", function () {
+          document.querySelectorAll(".sketch-carousel").forEach(function (c) {
+            if (document.hidden) {
+              if (typeof c._sketchPause === "function") c._sketchPause();
+            } else {
+              if (typeof c._sketchResume === "function") c._sketchResume();
+            }
+          });
         });
 
         lbPrev.addEventListener("click", function (e) {
