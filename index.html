@@ -182,6 +182,12 @@
       font-weight: 700;
       text-shadow: none;
     }
+    /* 스크롤 위치에 해당하는 구역 — 호버와 동일하게 볼드 */
+    .nav a.is-active {
+      font-weight: 700;
+      text-decoration: none;
+      text-shadow: none;
+    }
     .topbar__ig {
       display: inline-flex;
       align-items: center;
@@ -659,7 +665,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-template-rows: repeat(2, minmax(0, 1fr));
-      gap: clamp(0.25rem, 0.45vw, 0.45rem);
+      gap: clamp(0.1rem, 0.2vw, 0.22rem);
       width: min(92vw, 1280px);
       height: calc(100vh - 11rem);
       max-height: 100%;
@@ -693,7 +699,7 @@
       .lightbox__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         grid-template-rows: repeat(3, minmax(0, 1fr));
-        gap: 0.25rem;
+        gap: 0.12rem;
       }
     }
 
@@ -1484,6 +1490,64 @@
         }
       })();
 
+      /* 스크롤 위치에 맞춰 현재 구역 네비 링크 볼드 처리 */
+      (function () {
+        var nav = document.getElementById("site-nav");
+        var topbar = document.querySelector(".topbar");
+        if (!nav || !topbar) return;
+
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.prototype.map
+          .call(links, function (a) {
+            return a.getAttribute("href").slice(1);
+          })
+          .filter(function (id) {
+            return id && document.getElementById(id);
+          });
+
+        var pending = false;
+
+        function updateNavSpy() {
+          pending = false;
+          var line = topbar.getBoundingClientRect().bottom + 8;
+          var activeId = null;
+          var i;
+          for (i = ids.length - 1; i >= 0; i--) {
+            var sec = document.getElementById(ids[i]);
+            if (!sec) continue;
+            if (sec.getBoundingClientRect().top <= line) {
+              activeId = ids[i];
+              break;
+            }
+          }
+
+          links.forEach(function (a) {
+            var id = a.getAttribute("href").slice(1);
+            var on = id === activeId;
+            a.classList.toggle("is-active", on);
+            if (on) {
+              a.setAttribute("aria-current", "page");
+            } else {
+              a.removeAttribute("aria-current");
+            }
+          });
+        }
+
+        function scheduleUpdate() {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(updateNavSpy);
+        }
+
+        window.addEventListener("scroll", scheduleUpdate, { passive: true });
+        window.addEventListener("resize", scheduleUpdate);
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", updateNavSpy);
+        } else {
+          updateNavSpy();
+        }
+      })();
+
       document.querySelectorAll("img[data-fallback]").forEach(function (img) {
         var fb = img.getAttribute("data-fallback");
         if (!fb) return;
@@ -1688,7 +1752,7 @@
           if (!slides.length) return;
           var idx = 0;
           var timerId = null;
-          var INTERVAL_MS = 4800;
+          var INTERVAL_MS = 3200;
 
           function showSlide(n) {
             idx = (n + slides.length) % slides.length;
