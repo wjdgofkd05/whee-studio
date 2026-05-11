@@ -412,7 +412,7 @@
     }
     .mag-grid {
       display: grid;
-      column-gap: clamp(0.5rem, 0.9vw, 0.85rem);
+      column-gap: 24px;
       row-gap: clamp(2.35rem, 4vw, 3.25rem);
       grid-template-columns: 1fr;
     }
@@ -442,9 +442,8 @@
       position: fixed;
       inset: 0;
       z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: stretch;
       padding: 4rem 4.5rem;
       opacity: 0;
       visibility: hidden;
@@ -465,37 +464,53 @@
     .lightbox__inner {
       position: relative;
       z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: 1fr auto;
+      justify-items: center;
+      align-items: stretch;
       width: 100%;
       max-width: min(92vw, 1280px);
-      max-height: calc(100vh - 6rem);
+      justify-self: center;
+      gap: 1.25rem;
       pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.32s ease;
+      min-height: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox__inner {
+        transition: none;
+      }
     }
     .lightbox__img {
       pointer-events: auto;
       max-width: 100%;
-      max-height: calc(100vh - 11rem);
+      max-height: 100%;
       width: auto;
       height: auto;
       object-fit: contain;
-      opacity: 1;
-      transition: opacity 0.32s ease;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .lightbox__img {
-        transition: none;
-      }
+      grid-row: 1;
+      align-self: center;
+      justify-self: center;
+      min-height: 0;
     }
     .lightbox__grid {
       pointer-events: auto;
+      grid-row: 1;
+      align-self: stretch;
+      justify-self: stretch;
+      min-height: 0;
     }
     .lightbox__caption {
-      margin-top: 1.25rem;
+      margin-top: 0;
       text-align: center;
       max-width: 36rem;
       pointer-events: none;
+      grid-row: 2;
+      grid-column: 1;
+      justify-self: center;
+      align-self: end;
     }
     .lightbox__caption .title {
       display: block;
@@ -626,7 +641,7 @@
     figure.mag.sketch-carousel { cursor: pointer; }
     .sketch-frame {
       position: relative;
-      background: #f0f0f0;
+      background: #F0EFF4;
       aspect-ratio: 600 / 820;
       overflow: hidden;
       border-radius: 2px;
@@ -642,7 +657,7 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      background: #f0f0f0;
+      background: #F0EFF4;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.32s ease-in-out;
@@ -660,14 +675,15 @@
       object-fit: contain;
     }
 
-    /* 라이트박스 안의 6장 그리드(Some Sketches 전용 뷰) */
+    /* 라이트박스 안의 스케치 그리드(Some Sketches 전용 뷰) */
     .lightbox__grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-template-rows: repeat(2, minmax(0, 1fr));
       gap: clamp(0.1rem, 0.2vw, 0.22rem);
-      width: min(92vw, 1280px);
-      height: calc(100vh - 11rem);
+      width: 100%;
+      height: 100%;
+      max-width: min(92vw, 1280px);
       max-height: 100%;
     }
     .lightbox__grid figure {
@@ -687,12 +703,28 @@
       height: auto;
       object-fit: contain;
       display: block;
+      margin-inline: auto;
+    }
+    /* Some Sketches 5장: 데스크톱 3열에서 마지막 행 2점을 가운데 열에 배치 */
+    .lightbox__grid[data-count="5"] > figure:nth-child(4) {
+      grid-column: 2;
+    }
+    .lightbox__grid[data-count="5"] > figure:nth-child(5) {
+      grid-column: 3;
     }
     @media (max-width: 720px) {
       .lightbox__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         grid-template-rows: repeat(3, minmax(0, 1fr));
-        height: calc(100vh - 10rem);
+      }
+      .lightbox__grid[data-count="5"] > figure:nth-child(4),
+      .lightbox__grid[data-count="5"] > figure:nth-child(5) {
+        grid-column: auto;
+      }
+      .lightbox__grid[data-count="5"] > figure:nth-child(5) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: min(100%, 50%);
       }
     }
     @media (max-width: 420px) {
@@ -886,6 +918,7 @@
     <div class="topbar__inner">
       <a class="chapter__site-title chapter__site-title--topbar" href="#top" aria-label="Whee — 처음으로" aria-hidden="true" tabindex="-1">Whee</a>
       <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+        <a href="#y2026" data-nav-label="2026">2026</a>
         <a href="#y2025" data-nav-label="2025">2025</a>
         <a href="#y2024" data-nav-label="2024">2024</a>
         <a href="#y2023" data-nav-label="2023">2023</a>
@@ -926,6 +959,25 @@
     </div>
   </div>
 
+  <article class="chapter" id="y2026">
+    <div class="chapter__year-rail">
+      <div class="chapter__year">2026</div>
+    </div>
+    <div>
+      <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202025%202026%20Pastel%20and%20oil%20paint%20on%20canvas%20145%20x%20137%20cm.png?v=2" alt="Summer 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2025</span>
+            <span class="meta-line">Pastel and oil paint on canvas</span>
+            <span class="meta-line">145 × 137 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </article>
+
   <article class="chapter" id="y2025">
     <div class="chapter__year-rail">
       <div class="chapter__year">2025</div>
@@ -933,7 +985,178 @@
     <div>
       <div class="mag-grid">
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/Silent%20Scream%20%202025%20Oil%2C%20charcoal%2C%20oil%20crayon%20and%20oil%20paint%20on%20canvas%20%20120%20x%20132%20cm.jpg" alt="Silent Scream" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Summer%202024%20-%20II%202025%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20184%20x%20152%20cm.png?v=2" alt="Summer 2024 — II" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024 — II</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">184 × 152 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%20Landscape%202025%202025%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20165%20x%20132%20cm.png?v=3" alt="Summer Landscape 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer Landscape 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">165 × 132 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202024%202025%20Charcoal%20soft%20pastel%20oil%20stick%20and%20oil%20paint%20on%20canvas%20167%20x%20132%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024</span>
+            <span class="meta-line">Charcoal, soft pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">167 × 132 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202024%202025%20Pastel%20and%20oil%20paint%20on%20canvas%20147%20x%20102%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024</span>
+            <span class="meta-line">Pastel and oil paint on canvas</span>
+            <span class="meta-line">147 × 102 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Manila%20Summer%202025%202025%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%2097%20x%2092%20cm.png?v=2" alt="Manila Summer 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Manila Summer 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">97 × 92 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202024%202025%20Oil%20charcoal%20oil%20crayon%20and%20oil%20paint%20on%20canvas%2093%20x%2075%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024</span>
+            <span class="meta-line">Oil, charcoal, oil crayon and oil paint on canvas</span>
+            <span class="meta-line">93 × 75 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Summer%20Landscape%202025%20-%20II%202025%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%2047%20x%2054%20cm.png?v=2" alt="Summer Landscape 2025 — II" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer Landscape 2025 — II</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">47 × 54 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202024%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%20164%20x%20134%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024</span>
+            <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
+            <span class="meta-line">164 × 134 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Spring%202025%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%20164%20x%20134%20cm.JPG" alt="Spring 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Spring 2025</span>
+            <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
+            <span class="meta-line">164 × 134 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Summer%202024%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%2075.4%20x%2093%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2024</span>
+            <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
+            <span class="meta-line">75.4 × 93 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Winter%202024%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%2045.5%20x%2053%20cm.JPG" alt="Winter 2024" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Winter 2024</span>
+            <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
+            <span class="meta-line">45.5 × 53 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.png?v=3" alt="Silent Scream VI" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream VI</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">193.04 × 156.8 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png?v=3" alt="Silent Scream IV" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream IV</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">196 × 140 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20V%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20194%20x%20153.3%20cm.png?v=3" alt="Silent Scream V" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream V</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">194 × 153.3 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Untitled%201%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%2048.26%20x%2049.53%20cm.png?v=3" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">48.26 × 49.53 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Untitled%202%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%2043.8%20x%2050.8%20cm.png?v=3" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">43.8 × 50.8 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Untitled%203%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%2043.13%20x%2048.25%20cm.png?v=3" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">43.13 × 48.25 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Silent%20Scream%20VII%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20194%20x%20199%20cm.png?v=3" alt="Silent Scream VII" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream VII</span>
+            <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
+            <span class="meta-line">194 × 199 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Silent%20Scream%20III%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20176.5%20x%20140.3%20cm.png?v=3" alt="Silent Scream III" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Silent Scream III</span>
+            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
+            <span class="meta-line">176.5 × 140.3 cm</span>
+            <span class="meta-line">2025</span>
+          </figcaption>
+        </figure>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Silent%20Scream%20%202025%20Oil%2C%20charcoal%2C%20oil%20crayon%20and%20oil%20paint%20on%20canvas%20%20120%20x%20132%20cm.png?v=3" alt="Silent Scream" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream</span>
             <span class="meta-line">Oil, charcoal, oil crayon and oil paint on canvas</span>
@@ -942,7 +1165,7 @@
           </figcaption>
         </figure>
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/Silent%20Scream%20II%20%202025%20Soft%20pastel%2C%20charcoal%2C%20oil%20pastel%20and%20oil%20paint%20on%20canvas%20%20135.6%20x%20169.5%20cm.jpg" alt="Silent Scream II" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Silent%20Scream%20II%20%202025%20Soft%20pastel%2C%20charcoal%2C%20oil%20pastel%20and%20oil%20paint%20on%20canvas%20%20135.6%20x%20169.5%20cm.png?v=3" alt="Silent Scream II" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream II</span>
             <span class="meta-line">Soft pastel, charcoal, oil pastel and oil paint on canvas</span>
@@ -950,30 +1173,12 @@
             <span class="meta-line">2025</span>
           </figcaption>
         </figure>
-        <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20III%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20176.5%20x%20140.3%20cm%20.jpeg" alt="Silent Scream III" loading="lazy" /></div>
-          <figcaption>
-            <span class="title">Silent Scream III</span>
-            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
-            <span class="meta-line">176.5 × 140.3 cm</span>
-            <span class="meta-line">2025</span>
-          </figcaption>
-        </figure>
-        <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png" alt="Silent Scream IV" loading="lazy" /></div>
-          <figcaption>
-            <span class="title">Silent Scream IV</span>
-            <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
-            <span class="meta-line">196 × 140 cm</span>
-            <span class="meta-line">2025</span>
-          </figcaption>
-        </figure>
         <figure class="mag square">
-          <div class="frame"><img src="assets/Untitled%20%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20%2043.15%20x%2048.25%20cm.png" alt="Untitled" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Untitled%204%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%2068%20x%2069%20cm.png?v=3" alt="Untitled" loading="lazy" /></div>
           <figcaption>
             <span class="title">Untitled</span>
             <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
-            <span class="meta-line">43.15 × 48.25 cm</span>
+            <span class="meta-line">68 × 69 cm</span>
             <span class="meta-line">2025</span>
           </figcaption>
         </figure>
@@ -987,12 +1192,27 @@
     </div>
     <div class="chapter__body">
       <div class="mag-grid">
-        <figure class="mag landscape">
-          <div class="frame"><img src="assets/Garden%20of%20Birds%20of%20Paradise%20%202024%20Acrylic%20and%20oil%20on%20canvas%20122%20x%2091.4%20cm.jpg" alt="Garden of Birds of Paradise" loading="lazy" /></div>
+        <figure class="mag sketch-carousel" data-sketch-count="5">
+          <div class="frame sketch-frame">
+            <div class="sketch-stage" aria-live="polite" aria-label="Some Sketches — automatic slideshow">
+              <div class="sketch-slide is-active"><img src="assets/Some%20Sketches%202.jpg" alt="Some Sketches — 1 of 5" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%203.jpg" alt="Some Sketches — 2 of 5" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%204.jpg" alt="Some Sketches — 3 of 5" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%205.jpg" alt="Some Sketches — 4 of 5" loading="lazy" /></div>
+              <div class="sketch-slide"><img src="assets/Some%20Sketches%206.jpg" alt="Some Sketches — 5 of 5" loading="lazy" /></div>
+            </div>
+          </div>
           <figcaption>
-            <span class="title">Garden of Birds of Paradise</span>
-            <span class="meta-line">Acrylic and oil on canvas</span>
-            <span class="meta-line">122 × 91.4 cm</span>
+            <span class="title">Some Sketches</span>
+            <span class="meta-line">2024</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202024%20Oil%20on%20canvas%20169%20x%20118%20cm.jpg" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">169 × 118 cm</span>
             <span class="meta-line">2024</span>
           </figcaption>
         </figure>
@@ -1006,27 +1226,11 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Untitled%20%202024%20Oil%20on%20canvas%20169%20x%20118%20cm.jpg" alt="Untitled" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Garden%20of%20Birds%20of%20Paradise%20%202024%20Acrylic%20and%20oil%20on%20canvas%20122%20x%2091.4%20cm.jpg" alt="Garden of Birds of Paradise" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Untitled</span>
-            <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">169 × 118 cm</span>
-            <span class="meta-line">2024</span>
-          </figcaption>
-        </figure>
-        <figure class="mag sketch-carousel" data-sketch-count="6">
-          <div class="frame sketch-frame">
-            <div class="sketch-stage" aria-live="polite" aria-label="Some Sketches — automatic slideshow">
-              <div class="sketch-slide is-active"><img src="assets/Some%20Sketches%201.png" alt="Some Sketches — 1 of 6" loading="lazy" /></div>
-              <div class="sketch-slide"><img src="assets/Some%20Sketches%202.jpg" alt="Some Sketches — 2 of 6" loading="lazy" /></div>
-              <div class="sketch-slide"><img src="assets/Some%20Sketches%203.jpg" alt="Some Sketches — 3 of 6" loading="lazy" /></div>
-              <div class="sketch-slide"><img src="assets/Some%20Sketches%204.jpg" alt="Some Sketches — 4 of 6" loading="lazy" /></div>
-              <div class="sketch-slide"><img src="assets/Some%20Sketches%205.jpg" alt="Some Sketches — 5 of 6" loading="lazy" /></div>
-              <div class="sketch-slide"><img src="assets/Some%20Sketches%206.jpg" alt="Some Sketches — 6 of 6" loading="lazy" /></div>
-            </div>
-          </div>
-          <figcaption>
-            <span class="title">Some Sketches</span>
+            <span class="title">Garden of Birds of Paradise</span>
+            <span class="meta-line">Acrylic and oil on canvas</span>
+            <span class="meta-line">122 × 91.4 cm</span>
             <span class="meta-line">2024</span>
           </figcaption>
         </figure>
@@ -1040,21 +1244,12 @@
     </div>
     <div>
       <div class="mag-grid mag-grid--spaced">
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/A%20Study%20for%20Nature%20%202023%20Watercolor%20and%20acrylic%20on%20paper%20111%20x%20147%20cm.png" alt="A Study for Nature" loading="lazy" /></div>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Starry%20Night%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20122%20x%20122%20cm.png" alt="Starry Night" loading="lazy" /></div>
           <figcaption>
-            <span class="title">A Study for Nature</span>
-            <span class="meta-line">Watercolor and acrylic on paper</span>
-            <span class="meta-line">111 × 147 cm</span>
-            <span class="meta-line">2023</span>
-          </figcaption>
-        </figure>
-        <figure class="mag landscape">
-          <div class="frame"><img src="assets/All%20of%20Me%20Wants%20All%20of%20You%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20182%20x%20142%20cm.png" alt="All of Me Wants All of You" loading="lazy" /></div>
-          <figcaption>
-            <span class="title">All of Me Wants All of You</span>
+            <span class="title">Starry Night</span>
             <span class="meta-line">Oil and watercolor on canvas</span>
-            <span class="meta-line">182 × 142 cm</span>
+            <span class="meta-line">122 × 122 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
@@ -1068,20 +1263,20 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Frozen%20%202023%20Acrylic%20on%20canvas%20163%20x%20130%20cm.png" alt="Frozen" loading="lazy" /></div>
+          <div class="frame"><img src="assets/All%20of%20Me%20Wants%20All%20of%20You%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20182%20x%20142%20cm.png" alt="All of Me Wants All of You" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Frozen</span>
-            <span class="meta-line">Acrylic on canvas</span>
-            <span class="meta-line">163 × 130 cm</span>
+            <span class="title">All of Me Wants All of You</span>
+            <span class="meta-line">Oil and watercolor on canvas</span>
+            <span class="meta-line">182 × 142 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
-        <figure class="mag square">
-          <div class="frame"><img src="assets/Starry%20Night%20%202023%20Oil%20and%20watercolor%20on%20canvas%20%20122%20x%20122%20cm.png" alt="Starry Night" loading="lazy" /></div>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%2C%20watercolor%20and%20acrylic%20on%20canvas%20%20135%20x%20112%20cm.png" alt="Untitled" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Starry Night</span>
-            <span class="meta-line">Oil and watercolor on canvas</span>
-            <span class="meta-line">122 × 122 cm</span>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil, watercolor and acrylic on canvas</span>
+            <span class="meta-line">135 × 112 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
@@ -1094,12 +1289,21 @@
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
-        <figure class="mag landscape">
-          <div class="frame"><img src="assets/Untitled%20%202023%20Oil%2C%20watercolor%20and%20acrylic%20on%20canvas%20%20135%20x%20112%20cm.png" alt="Untitled" loading="lazy" /></div>
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/A%20Study%20for%20Nature%20%202023%20Watercolor%20and%20acrylic%20on%20paper%20111%20x%20147%20cm.png" alt="A Study for Nature" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Untitled</span>
-            <span class="meta-line">Oil, watercolor and acrylic on canvas</span>
-            <span class="meta-line">135 × 112 cm</span>
+            <span class="title">A Study for Nature</span>
+            <span class="meta-line">Watercolor and acrylic on paper</span>
+            <span class="meta-line">111 × 147 cm</span>
+            <span class="meta-line">2023</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Frozen%20%202023%20Acrylic%20on%20canvas%20163%20x%20130%20cm.png" alt="Frozen" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Frozen</span>
+            <span class="meta-line">Acrylic on canvas</span>
+            <span class="meta-line">163 × 130 cm</span>
             <span class="meta-line">2023</span>
           </figcaption>
         </figure>
@@ -1151,11 +1355,11 @@
     <div>
       <div class="mag-grid">
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/A%20Doll%E2%80%99s%20Dream%20%202020%20Oil%20on%20canvas%2091%20x%20121%20cm.png" alt="A Doll’s Dream" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Nude%20Peach%20at%20Venice%20Beach%20%202020%20Oil%20on%20canvas%20163%20x%20262%20cm.png" alt="Nude Peach at Venice Beach" loading="lazy" /></div>
           <figcaption>
-            <span class="title">A Doll’s Dream</span>
+            <span class="title">Nude Peach at Venice Beach</span>
             <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">91 × 121 cm</span>
+            <span class="meta-line">163 × 262 cm</span>
             <span class="meta-line">2020</span>
           </figcaption>
         </figure>
@@ -1169,11 +1373,11 @@
           </figcaption>
         </figure>
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/Nude%20Peach%20at%20Venice%20Beach%20%202020%20Oil%20on%20canvas%20163%20x%20262%20cm.png" alt="Nude Peach at Venice Beach" loading="lazy" /></div>
+          <div class="frame"><img src="assets/A%20Doll%E2%80%99s%20Dream%20%202020%20Oil%20on%20canvas%2091%20x%20121%20cm.png" alt="A Doll’s Dream" loading="lazy" /></div>
           <figcaption>
-            <span class="title">Nude Peach at Venice Beach</span>
+            <span class="title">A Doll’s Dream</span>
             <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">163 × 262 cm</span>
+            <span class="meta-line">91 × 121 cm</span>
             <span class="meta-line">2020</span>
           </figcaption>
         </figure>
@@ -1215,6 +1419,15 @@
     </div>
     <div>
       <div class="mag-grid">
+        <figure class="mag portrait">
+          <div class="frame"><img src="assets/Untitled%20%202018%20Oil%20on%20canvas%20129%20x%20161cm.png" alt="Untitled" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Untitled</span>
+            <span class="meta-line">Oil on canvas</span>
+            <span class="meta-line">129 × 161 cm</span>
+            <span class="meta-line">2018</span>
+          </figcaption>
+        </figure>
         <figure class="mag landscape">
           <div class="frame"><img src="assets/Earth%20Painting%20-%20How%20We%20Forget%20to%20Appreciate%201-1%20%202018%20Oil%20on%20canvas%20160%20x%20180%20cm.png" alt="Earth Painting - How We Forget to Appreciate 1-1" loading="lazy" /></div>
           <figcaption>
@@ -1242,15 +1455,6 @@
             <span class="meta-line">2018</span>
           </figcaption>
         </figure>
-        <figure class="mag portrait">
-          <div class="frame"><img src="assets/Untitled%20%202018%20Oil%20on%20canvas%20129%20x%20161cm.png" alt="Untitled" loading="lazy" /></div>
-          <figcaption>
-            <span class="title">Untitled</span>
-            <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">129 × 161 cm</span>
-            <span class="meta-line">2018</span>
-          </figcaption>
-        </figure>
       </div>
     </div>
   </article>
@@ -1270,14 +1474,14 @@
             <p>My work explores how suppressed emotions twist internally and eventually expand into organic forms.</p>
             <p>The invisible pressures and tensions I experience as a woman are translated into layers of color, movement, density, and fracture on the canvas.</p>
             <p>Through uncontrolled gestures and accumulated surfaces, I portray emotions not as something that disappears, but as something that transforms and persists.</p>
-            <p>My paintings are not representations of nature, but manifestations of an inner landscape—a self-generated ecology of emotion.</p>
+            <p>My paintings are not representations of nature, but manifestations of an inner landscape—<br />a self-generated ecology of emotion.</p>
           </section>
           <section class="note-block" aria-label="작가 노트">
             <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
             <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
-            <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
-            <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해 감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
-            <p>나의 회화는 풍경이 아니라, 감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
+            <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은<br />화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
+            <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해<br />감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
+            <p>나의 회화는 풍경이 아니라,<br />감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
           </section>
         </div>
       </div>
@@ -1300,6 +1504,7 @@
       <div class="cv-card">
         <h4>Solo Exhibition / Awarded Exhibition</h4>
         <ul>
+          <li>2026 <em>Whispers of Summer Forests</em>, The Columns Gallery, Gilman Barracks, Singapore</li>
           <li>2025 <em>Silent Scream</em>, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
           <li>2023 <em>Supreme Yard</em>, Leon Gallery, Manila, Philippines</li>
           <li>2013 <em>Idolic Bonanza</em>, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
@@ -1325,6 +1530,7 @@
       <div class="cv-card">
         <h4>Press</h4>
         <ul>
+          <li>2026 The Korea Times — <a href="https://www.koreatimes.co.kr/lifestyle/arts-theater/20260124/korean-artists-curators-expand-footprint-at-singapore-art-week-2026?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGnwsBpDsWWf9gVOuhSRU_DiyI5vSUzIlYSxNQ6uvQMyShwZOan2GG6gEELh7U_aem_Lba-RGRd0VIYYpWi3vF5QQ" target="_blank" rel="noopener noreferrer"><em>Korean artists, curators expand footprint at Singapore Art Week 2026</em></a></li>
           <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer"><em>Wild Women</em></a></li>
           <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer"><em>Wonhee Delgado embodies the delights of making art dynamic</em></a></li>
           <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer"><em>León Gallery presents Whee's solo exhibition, showcasing fantasy as a journey to the self</em></a></li>
@@ -1565,6 +1771,7 @@
         var lbImg = lb.querySelector(".lightbox__img");
         var lbGrid = lb.querySelector(".lightbox__grid");
         var lbCap = lb.querySelector(".lightbox__caption");
+        var lbInner = lb.querySelector(".lightbox__inner");
         var lbPrev = lb.querySelector(".lightbox__prev");
         var lbNext = lb.querySelector(".lightbox__next");
         var cards = Array.prototype.slice
@@ -1575,6 +1782,7 @@
         var lbIdx = 0;
         var lbNavGen = 0;
         var lbReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        var DISSOLVE_MS = 320;
 
         function captionHTML(fig) {
           var title = fig.querySelector(".title");
@@ -1600,52 +1808,12 @@
             cell.appendChild(cellImg);
             lbGrid.appendChild(cell);
           });
+          lbGrid.setAttribute("data-count", String(imgs.length));
         }
 
-        function applySingleFigure(fig) {
-          if (lbGrid) {
-            lbGrid.hidden = true;
-            lbGrid.innerHTML = "";
-          }
-          lbImg.hidden = false;
-          var imgEl = fig.querySelector("img");
-          lbImg.src = imgEl.currentSrc || imgEl.src;
-          lbImg.alt = imgEl.getAttribute("alt") || "";
-          lbCap.innerHTML = captionHTML(fig);
-        }
-
-        function openLightbox(index) {
-          if (!cards.length) return;
-          var navId = ++lbNavGen;
-
-          var wasOpen = lb.classList.contains("is-open");
-          var prevIdx = lbIdx;
-          var prevHadSingle =
-            wasOpen &&
-            lbImg &&
-            !lbImg.hidden &&
-            lbGrid &&
-            lbGrid.hidden &&
-            !cards[prevIdx].classList.contains("sketch-carousel");
-
-          lbIdx = (index + cards.length) % cards.length;
-          var fig = cards[lbIdx];
+        function paintFigure(fig) {
           var isSketchSet = fig.classList.contains("sketch-carousel");
-
-          var shouldDissolve =
-            !lbReduceMotion.matches &&
-            prevHadSingle &&
-            !isSketchSet &&
-            prevIdx !== lbIdx &&
-            wasOpen;
-
-          if (pausedSketchCarousel && pausedSketchCarousel !== fig && typeof pausedSketchCarousel._sketchResume === "function") {
-            pausedSketchCarousel._sketchResume();
-            pausedSketchCarousel = null;
-          }
-
           if (isSketchSet) {
-            lbImg.style.opacity = "";
             lbImg.removeAttribute("src");
             lbImg.hidden = true;
             if (lbGrid) {
@@ -1656,56 +1824,80 @@
               fig._sketchPause();
               pausedSketchCarousel = fig;
             }
-            lbCap.innerHTML = captionHTML(fig);
           } else {
-            function revealLoaded() {
-              if (navId !== lbNavGen) return;
-              requestAnimationFrame(function () {
-                if (navId !== lbNavGen) return;
-                lbImg.style.opacity = "1";
-              });
+            if (lbGrid) {
+              lbGrid.hidden = true;
+              lbGrid.innerHTML = "";
             }
-            function afterFadeOut() {
+            lbImg.hidden = false;
+            var imgEl = fig.querySelector("img");
+            lbImg.src = imgEl.currentSrc || imgEl.src;
+            lbImg.alt = imgEl.getAttribute("alt") || "";
+          }
+          lbCap.innerHTML = captionHTML(fig);
+        }
+
+        function fadeIn(navId) {
+          if (navId !== lbNavGen || !lbInner) return;
+          requestAnimationFrame(function () {
+            if (navId !== lbNavGen || !lbInner) return;
+            lbInner.style.opacity = "1";
+          });
+        }
+
+        function openLightbox(index) {
+          if (!cards.length) return;
+          var navId = ++lbNavGen;
+
+          var wasOpen = lb.classList.contains("is-open");
+          var prevIdx = lbIdx;
+          lbIdx = (index + cards.length) % cards.length;
+          var fig = cards[lbIdx];
+
+          if (pausedSketchCarousel && pausedSketchCarousel !== fig && typeof pausedSketchCarousel._sketchResume === "function") {
+            pausedSketchCarousel._sketchResume();
+            pausedSketchCarousel = null;
+          }
+
+          var shouldDissolve = !lbReduceMotion.matches && wasOpen && prevIdx !== lbIdx && !!lbInner;
+
+          function commit() {
+            if (navId !== lbNavGen) return;
+            paintFigure(fig);
+            if (lbInner) fadeIn(navId);
+          }
+
+          if (shouldDissolve) {
+            var done = false;
+            var fallback = setTimeout(function () {
+              if (done || navId !== lbNavGen) return;
+              done = true;
+              commit();
+            }, DISSOLVE_MS + 40);
+            function onFadeOut(e) {
+              if (e.propertyName !== "opacity") return;
               if (navId !== lbNavGen) return;
-              applySingleFigure(fig);
-              if (lbImg.complete && lbImg.naturalWidth) {
-                revealLoaded();
-              } else {
-                lbImg.addEventListener("load", revealLoaded, { once: true });
-                lbImg.addEventListener("error", revealLoaded, { once: true });
-              }
+              if (done) return;
+              done = true;
+              clearTimeout(fallback);
+              lbInner.removeEventListener("transitionend", onFadeOut);
+              commit();
             }
-            if (shouldDissolve) {
-              var dissolveDone = false;
-              var dissolveMs = 340;
-              var fallbackTimer = setTimeout(function () {
-                if (dissolveDone || navId !== lbNavGen) return;
-                dissolveDone = true;
-                afterFadeOut();
-              }, dissolveMs);
-              function onFadeOut(e) {
-                if (e.propertyName !== "opacity") return;
-                if (navId !== lbNavGen) return;
-                if (dissolveDone) return;
-                dissolveDone = true;
-                clearTimeout(fallbackTimer);
-                lbImg.removeEventListener("transitionend", onFadeOut);
-                afterFadeOut();
-              }
-              lbImg.addEventListener("transitionend", onFadeOut);
-              lbImg.style.opacity = "0";
-            } else {
-              applySingleFigure(fig);
+            lbInner.addEventListener("transitionend", onFadeOut);
+            lbInner.style.opacity = "0";
+          } else {
+            paintFigure(fig);
+            if (lbInner) {
               if (!wasOpen) {
-                lbImg.style.opacity = "0";
+                lbInner.style.opacity = "0";
                 requestAnimationFrame(function () {
                   requestAnimationFrame(function () {
                     if (navId !== lbNavGen) return;
-                    lbImg.style.opacity = "1";
+                    lbInner.style.opacity = "1";
                   });
                 });
               } else {
-                lbImg.style.opacity = "1";
+                lbInner.style.opacity = "1";
               }
             }
           }
@@ -1723,6 +1915,7 @@
           lb.hidden = true;
           lbImg.removeAttribute("src");
           lbImg.style.opacity = "";
+          if (lbInner) lbInner.style.opacity = "";
           if (lbGrid) {
             lbGrid.innerHTML = "";
             lbGrid.hidden = true;
