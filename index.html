@@ -455,7 +455,9 @@
       position: fixed;
       inset: 0;
       z-index: 300;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 4rem 0;
       opacity: 0;
       visibility: hidden;
@@ -474,11 +476,9 @@
       cursor: pointer;
     }
     .lightbox__inner {
-      position: absolute;
-      left: 50%;
-      top: 50%;
+      position: relative;
       z-index: 1;
-      transform: translate(-50%, -50%);
+      flex: 0 1 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -504,6 +504,8 @@
       width: auto;
       height: auto;
       object-fit: contain;
+      object-position: center;
+      image-rendering: auto;
       flex: 0 1 auto;
       min-height: 0;
     }
@@ -635,11 +637,25 @@
       background: transparent;
       width: 100%;
     }
+    /* 회화·사진: contain + auto (cover·-webkit-optimize-contrast는 크롭/밴딩 유발) */
+    figure.mag .frame img,
+    .lightbox__img,
+    .lightbox__grid img,
+    .sketch-slide img,
+    .chapter--note .note-photo img {
+      object-fit: contain;
+      object-position: center;
+      image-rendering: auto;
+    }
     figure.mag .frame img {
       width: 100%;
       height: auto;
       display: block;
-      vertical-align: middle;
+    }
+    figure.mag .frame img[data-media-capped] {
+      width: auto;
+      max-width: 100%;
+      margin-inline: auto;
     }
 
     figure.mag.span2 {
@@ -693,7 +709,6 @@
       width: auto;
       height: auto;
       display: block;
-      object-fit: contain;
     }
 
     /* 라이트박스 안의 스케치 그리드(Some Sketches 전용 뷰) */
@@ -726,7 +741,6 @@
       max-height: min(44vh, 460px);
       width: auto;
       height: auto;
-      object-fit: contain;
       display: block;
       margin-inline: auto;
     }
@@ -909,6 +923,16 @@
     #cv .chapter__year--section {
       line-height: 0.92;
     }
+    @media (max-width: 1024px) {
+      .chapter__year--section {
+        font-size: clamp(1.65rem, 4vw, 2.2rem);
+      }
+    }
+    @media (max-width: 640px) {
+      .chapter__year--section {
+        font-size: clamp(1.45rem, 5.5vw, 1.75rem);
+      }
+    }
     .chapter--note .note-photo {
       margin-bottom: 1.5rem;
       max-width: 100%;
@@ -1042,7 +1066,7 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Summer%202024%202026%20Charcoal%20pastel%20and%20oil%20on%20canvas%2060.6%20x%2050%20cm.png" alt="Summer 2024" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Summer%202024%202026%20Charcoal%20pastel%20and%20oil%20on%20canvas%2060.6%20x%2050%20cm.png?v=3" alt="Summer 2024" loading="lazy" /></div>
           <figcaption>
             <span class="title">Summer 2024</span>
             <span class="meta-line">Charcoal, pastel and oil on canvas</span>
@@ -1169,7 +1193,7 @@
           </figcaption>
         </figure>
         <figure class="mag portrait">
-          <div class="frame"><img src="assets/Summer%202024%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%20164%20x%20134%20cm.png?v=2" alt="Summer 2024" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Summer%202024%202025%20Charcoal%2C%20soft%20pastel%2C%20and%20oil%20paint%20on%20canvas%20164%20x%20134%20cm.png?v=3" alt="Summer 2024" loading="lazy" /></div>
           <figcaption>
             <span class="title">Summer 2024</span>
             <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
@@ -1205,7 +1229,7 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.png?v=3" alt="Silent Scream VI" loading="lazy" /></div>
+          <div class="frame"><img src="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.png?v=4" alt="Silent Scream VI" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream VI</span>
             <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
@@ -2059,6 +2083,77 @@
         });
       });
 
+      /* 원본 비율 유지 · 레티나에서 CSS 업스케일 방지 + intrinsic 힌트 */
+      (function initMediaImages() {
+        var MEDIA_IMG =
+          "figure.mag .frame img, .lightbox__img, .lightbox__grid img, .sketch-slide img, .chapter--note .note-photo img";
+
+        function slotWidth(img) {
+          var frame = img.closest(".frame");
+          if (frame && frame.clientWidth) return frame.clientWidth;
+          if (img.classList.contains("lightbox__img")) {
+            var inner = img.closest(".lightbox__inner");
+            if (inner && inner.clientWidth) return inner.clientWidth;
+          }
+          var fig = img.closest("figure");
+          if (fig && fig.clientWidth) return fig.clientWidth;
+          var parent = img.parentElement;
+          return parent ? parent.clientWidth : 0;
+        }
+
+        function tuneMediaImg(img) {
+          if (!img.naturalWidth) return;
+          if (!img.getAttribute("width")) {
+            img.setAttribute("width", String(img.naturalWidth));
+            img.setAttribute("height", String(img.naturalHeight));
+          }
+          var dpr = Math.min(window.devicePixelRatio || 1, 3);
+          var cap = img.naturalWidth / dpr;
+          var slotW = slotWidth(img);
+          if (!slotW) return;
+          if (slotW > cap + 0.5) {
+            img.style.width = "auto";
+            img.style.maxWidth = Math.round(cap) + "px";
+            img.style.height = "auto";
+            img.style.marginLeft = "auto";
+            img.style.marginRight = "auto";
+            img.setAttribute("data-media-capped", "");
+          } else {
+            img.style.width = "";
+            img.style.maxWidth = "";
+            img.style.height = "";
+            img.style.marginLeft = "";
+            img.style.marginRight = "";
+            img.removeAttribute("data-media-capped");
+          }
+        }
+
+        function bindMediaImg(img) {
+          function run() {
+            tuneMediaImg(img);
+          }
+          if (img.complete) run();
+          else img.addEventListener("load", run, { once: true });
+        }
+
+        function tuneAllMedia() {
+          document.querySelectorAll(MEDIA_IMG).forEach(tuneMediaImg);
+        }
+
+        document.querySelectorAll(MEDIA_IMG).forEach(bindMediaImg);
+        window.addEventListener("load", tuneAllMedia);
+        var resizeTimer;
+        window.addEventListener("resize", function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(tuneAllMedia, 120);
+        });
+        window.initMediaImages = {
+          tune: tuneMediaImg,
+          bind: bindMediaImg,
+          tuneAll: tuneAllMedia,
+        };
+      })();
+
       /* 라이트박스 (Some Sketches는 6장 그리드 뷰로 통합) */
       var lb = document.getElementById("lightbox");
       var pausedSketchCarousel = null;
@@ -2101,6 +2196,8 @@
             cellImg.src = img.currentSrc || img.src;
             cellImg.alt = "Some Sketches — " + (i + 1) + " of " + imgs.length;
             cellImg.loading = "lazy";
+            cellImg.decoding = "async";
+            if (window.initMediaImages) window.initMediaImages.bind(cellImg);
             cell.appendChild(cellImg);
             lbGrid.appendChild(cell);
           });
@@ -2129,6 +2226,7 @@
             var imgEl = fig.querySelector("img");
             lbImg.src = imgEl.currentSrc || imgEl.src;
             lbImg.alt = imgEl.getAttribute("alt") || "";
+            if (window.initMediaImages) window.initMediaImages.bind(lbImg);
           }
           lbCap.innerHTML = captionHTML(fig);
         }
