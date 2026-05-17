@@ -382,28 +382,6 @@
       color: var(--ink);
       line-height: 1.55;
     }
-    .chapter__intro-mail {
-      margin: 0;
-      margin-top: 0.5rem;
-    }
-    .chapter__mail-btn {
-      font: inherit;
-      font-size: var(--cap-size);
-      font-weight: 400;
-      color: var(--ink);
-      line-height: 1.55;
-      text-decoration: none;
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      text-align: left;
-    }
-    .chapter__mail-btn:hover {
-      color: var(--ink);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
     .chapter > div:not(.chapter__year) {
       min-width: 0;
     }
@@ -869,32 +847,6 @@
       color: var(--ink);
     }
 
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: clamp(1.25rem, 4vh, 2rem);
-      transform: translate(-50%, 12px);
-      z-index: 400;
-      padding: 0.7rem 1.1rem;
-      border-radius: 999px;
-      background: rgba(17, 17, 17, 0.92);
-      color: #ffffff;
-      font-size: 0.9rem;
-      letter-spacing: 0.01em;
-      line-height: 1.2;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.25s ease;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
-    }
-    .toast.is-visible {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .toast { transition: opacity 0.2s ease; transform: translate(-50%, 0); }
-    }
-
     /* 앵커 점프 시 상단 스티키 GNB에 가리지 않도록 — 라벨이 sticky 위치에 딱 맞도록 보정 */
     .chapter[id^="y"] {
       scroll-margin-top: var(--anchor-scroll-margin);
@@ -1044,9 +996,6 @@
     <div class="chapter__intro-band">
       <h1 class="chapter__site-title chapter__site-title--hero">Whee</h1>
       <p class="chapter__intro-bio">1984 Born in Seoul, Korea. Lives and works in Seoul and Manila.</p>
-      <p class="chapter__intro-mail">
-        <button type="button" class="chapter__mail-btn" aria-label="이메일 주소 복사" title="woni.cha@gmail.com">woni.cha@gmail.com</button>
-      </p>
     </div>
   </div>
 
@@ -1875,8 +1824,6 @@
 
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
   <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="작품 크게 보기" tabindex="-1" hidden>
     <div class="lightbox__backdrop" data-close-lightbox></div>
     <button type="button" class="lightbox__btn lightbox__prev" aria-label="이전 작품">
@@ -1894,46 +1841,6 @@
 
   <script>
     (function () {
-      var STUDIO_EMAIL = "woni.cha@gmail.com";
-      var toastEl = document.getElementById("toast");
-      var toastTimer = null;
-      function showToast(message) {
-        if (!toastEl) return;
-        toastEl.textContent = message;
-        toastEl.classList.add("is-visible");
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(function () {
-          toastEl.classList.remove("is-visible");
-        }, 1800);
-      }
-
-      function copyEmail() {
-        function done() { showToast("Email copied to clipboard"); }
-        function fallback() {
-          var ta = document.createElement("textarea");
-          ta.value = STUDIO_EMAIL;
-          ta.setAttribute("readonly", "");
-          ta.style.cssText = "position:fixed;left:-9999px;top:0";
-          document.body.appendChild(ta);
-          ta.select();
-          try {
-            if (document.execCommand("copy")) done();
-          } catch (e) {}
-          document.body.removeChild(ta);
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(STUDIO_EMAIL).then(done).catch(fallback);
-        } else {
-          fallback();
-        }
-      }
-
-      document.querySelectorAll(".chapter__mail-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          copyEmail();
-        });
-      });
-
       (function () {
         var topbarEl = document.querySelector(".topbar");
         var heroTitle = document.querySelector(".chapter__site-title--hero");
