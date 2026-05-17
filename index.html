@@ -779,6 +779,7 @@
     }
     @media (min-width: 800px) {
       .cv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cv-card--span-full { grid-column: 1 / -1; }
     }
     .cv-card h4 {
       font-size: 0.9rem;
@@ -789,12 +790,38 @@
       padding-bottom: 0.35rem;
       border-bottom: 1px solid #000000;
     }
-    .cv-card ul { list-style: none; }
-    .cv-card li {
-      font-size: var(--cap-size);
+    .cv-card ul { list-style: none; margin: 0; padding: 0; }
+    .cv-card ul.cv-list { list-style: none; }
+    .cv-card {
+      --cv-year-col: 9.5rem;
+    }
+    .cv-card .cv-year-group {
+      display: grid;
+      grid-template-columns: var(--cv-year-col) 1fr;
+      gap: 0 0.65rem;
+      align-items: start;
       padding: 0.45rem 0;
+    }
+    .cv-card .cv-year {
+      font-size: var(--cap-size);
+      font-weight: 500;
       color: var(--ink);
       line-height: 1.55;
+      white-space: nowrap;
+    }
+    .cv-card .cv-year-items {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .cv-card .cv-year-items li {
+      font-size: var(--cap-size);
+      padding: 0;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .cv-card .cv-year-items li + li {
+      margin-top: 0.15rem;
     }
     .cv-card a {
       color: var(--ink);
@@ -1002,12 +1029,57 @@
             <span class="meta-line">2026</span>
           </figcaption>
         </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20116.7%20x%2091%20cm.png" alt="Autumn 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Autumn 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">116.7 × 91 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Summer%202025%202026%20Charcoal%20pastel%20and%20oil%20color%20on%20canvas%20162%20x%20130%20cm.png?v=3" alt="Summer 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil color on canvas</span>
+            <span class="meta-line">162 × 130 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Study%20of%20Silent%20Scream%20VII%202026%20Pastel%20and%20oil%20crayon%20on%20canvas%2050%20x%2043%20cm.png" alt="Study of Silent Scream VII" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Study of Silent Scream VII</span>
+            <span class="meta-line">Pastel and oil crayon on canvas</span>
+            <span class="meta-line">50 × 43 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+        <figure class="mag landscape">
+          <div class="frame"><img src="assets/Summer%202025%202026%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20162%20x%20130%20cm.png?v=2" alt="Summer 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Summer 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
+            <span class="meta-line">162 × 130 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
         <figure class="mag portrait">
           <div class="frame"><img src="assets/Summer%202025%202026%20Pastel%20and%20oil%20paint%20on%20canvas%20145%20x%20137%20cm.png?v=2" alt="Summer 2025" loading="lazy" /></div>
           <figcaption>
             <span class="title">Summer 2025</span>
             <span class="meta-line">Pastel and oil paint on canvas</span>
             <span class="meta-line">145 × 137 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img src="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20on%20canvas%20100%20x%20100%20cm.png" alt="Autumn 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Autumn 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil on canvas</span>
+            <span class="meta-line">100 × 100 cm</span>
             <span class="meta-line">2026</span>
           </figcaption>
         </figure>
@@ -1533,48 +1605,196 @@
       <div class="cv-grid">
       <div class="cv-card">
         <h4>Education</h4>
-        <ul>
-          <li>2012 MFA, Sculpture, Seoul National University, Seoul, Korea</li>
-          <li>2007 BFA, Sculpture, Rhode Island School of Design, Providence, Rhode Island, U.S.</li>
+        <ul class="cv-list">
+          <li class="cv-year-group">
+            <span class="cv-year">2012</span>
+            <ul class="cv-year-items">
+              <li>MFA, Sculpture, Seoul National University, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2007</span>
+            <ul class="cv-year-items">
+              <li>BFA, Sculpture, Rhode Island School of Design (RISD), Providence, Rhode Island, U.S.</li>
+            </ul>
+          </li>
         </ul>
       </div>
       <div class="cv-card">
-        <h4>Solo Exhibition / Awarded Exhibition</h4>
-        <ul>
-          <li>2026 <em>Whispers of Summer Forests</em>, The Columns Gallery, Gilman Barracks, Singapore</li>
-          <li>2025 <em>Silent Scream</em>, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
-          <li>2023 <em>Supreme Yard</em>, Leon Gallery, Manila, Philippines</li>
-          <li>2013 <em>Idolic Bonanza</em>, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
-          <li>2011 <em>Spring up! Mentoring Project 2011</em>, Two Person Exhibition - Seoul Foundation of Arts and Culture Sponsored Project, Space Can, Seoul, Korea</li>
+        <h4>Solo Exhibitions · Awarded Exhibitions</h4>
+        <ul class="cv-list">
+          <li class="cv-year-group">
+            <span class="cv-year">2027 (Forthcoming)</span>
+            <ul class="cv-year-items">
+              <li>Pyo Gallery, Seoul, Korea (September 2027)</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2026</span>
+            <ul class="cv-year-items">
+              <li><em>Whispers of Summer Forests</em>, The Columns Gallery, Gilman Barracks, Singapore</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2025</span>
+            <ul class="cv-year-items">
+              <li><em>Silent Scream</em>, Pintô Art Museum and Arboretum, Antipolo, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2023</span>
+            <ul class="cv-year-items">
+              <li><em>Supreme Yard</em>, Leon Gallery, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2013</span>
+            <ul class="cv-year-items">
+              <li><em>Idolic Bonanza</em>, Competition Awards Solo Exhibition, Kunst Dog, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2011</span>
+            <ul class="cv-year-items">
+              <li><em>Spring up! Mentoring Project 2011</em>, Two Person Exhibition - Seoul Foundation of Arts and Culture Sponsored Project, Space Can, Seoul, Korea</li>
+            </ul>
+          </li>
         </ul>
       </div>
       <div class="cv-card">
-        <h4>Group Exhibition</h4>
-        <ul>
-          <li>2024 <em>Wild: Women Abstractionists on Nature</em>, Metropolitan Museum of Manila, Manila, Philippines</li>
-          <li>2023 <em>Gallery Benefit 2023</em>, National Gallery Singapore, Singapore</li>
-          <li>2022 <em>Art Detour II</em>, Leon Gallery, Manila, Philippines</li>
-          <li>2021 <em>From Vivid Color to Image</em>, Manila House, Manila, Philippines</li>
-          <li>2021 <em>Art Detour</em>, Leon Gallery, Manila, Philippines</li>
-          <li>2020 <em>Women and Time</em>, Assumption College, Manila, Philippines</li>
-          <li>2018 <em>Heritage-Trace: RISD exhibition</em>, L'espass 71 Gallery, Seoul, Korea</li>
-          <li>2017 <em>1968 Contemporary Space 2017</em>, Contemporary Space Association 50 Year Anniversary Exhibition, Kim Jong-young Museum, Seoul, Korea</li>
-          <li>2017 <em>RED: RISD Exhibition</em>, Sophis Gallery, Seoul, Korea</li>
-          <li>2015 <em>Prelude for Twenty Differences</em>, Art Space Flask, Seoul, Korea</li>
-          <li>2012 <em>Exhibition for Outstanding Graduate Students</em>, Seoul National University Museum of Art MOA, Gwanak-gu, Seoul, Korea</li>
+        <h4>Group Exhibitions</h4>
+        <ul class="cv-list">
+          <li class="cv-year-group">
+            <span class="cv-year">2024</span>
+            <ul class="cv-year-items">
+              <li><em>Wild: Women Abstractionists on Nature</em>, Metropolitan Museum of Manila, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2023</span>
+            <ul class="cv-year-items">
+              <li><em>Gallery Benefit 2023</em>, National Gallery Singapore, Singapore</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2022</span>
+            <ul class="cv-year-items">
+              <li><em>Art Detour II</em>, Leon Gallery, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2021</span>
+            <ul class="cv-year-items">
+              <li><em>From Vivid Color to Image</em>, Manila House, Manila, Philippines</li>
+              <li><em>Art Detour</em>, Leon Gallery, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2020</span>
+            <ul class="cv-year-items">
+              <li><em>Women and Time</em>, Assumption College, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2018</span>
+            <ul class="cv-year-items">
+              <li><em>Heritage-Trace: RISD exhibition</em>, L'espass 71 Gallery, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2017</span>
+            <ul class="cv-year-items">
+              <li><em>1968 Contemporary Space 2017</em>, Contemporary Space Association 50 Year Anniversary Exhibition, Kim Jong-young Museum, Seoul, Korea</li>
+              <li><em>RED: RISD Exhibition</em>, Sophis Gallery, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2015</span>
+            <ul class="cv-year-items">
+              <li><em>Prelude for Twenty Differences</em>, Art Space Flask, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2012</span>
+            <ul class="cv-year-items">
+              <li><em>Exhibition for Outstanding Graduate Students</em>, Seoul National University Museum of Art MOA, Gwanak-gu, Seoul, Korea</li>
+            </ul>
+          </li>
         </ul>
       </div>
       <div class="cv-card">
+        <h4>Art Fairs</h4>
+        <ul class="cv-list">
+          <li class="cv-year-group">
+            <span class="cv-year">2026 (Forthcoming)</span>
+            <ul class="cv-year-items">
+              <li><em>Asia Now Paris</em>, The Columns Gallery, Paris, France</li>
+              <li><em>Kiaf SEOUL</em>, The Columns Gallery, Seoul, Korea</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2026</span>
+            <ul class="cv-year-items">
+              <li><em>Art Busan</em>, The Columns Gallery, Busan, Korea</li>
+              <li><em>Galleries Art Fair</em>, Pyo Gallery, Seoul, Korea</li>
+              <li><em>Galleries Art Fair</em>, The Columns Gallery, Seoul, Korea</li>
+              <li><em>ART SG</em>, The Columns Gallery, Singapore</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2025</span>
+            <ul class="cv-year-items">
+              <li><em>Asia Now Paris</em>, The Columns Gallery, Paris, France</li>
+              <li><em>Kiaf SEOUL</em>, The Columns Gallery, Seoul, Korea</li>
+              <li><em>Kiaf SEOUL</em>, Laheen Gallery, Seoul, Korea</li>
+              <li><em>Tokyo Gendai</em>, The Columns Gallery, Yokohama, Japan</li>
+              <li><em>Art Fair Philippines</em>, The Columns Gallery, Manila, Philippines</li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2024</span>
+            <ul class="cv-year-items">
+              <li><em>Art Fair Philippines</em>, Kobayashi Gallery, Manila, Philippines</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="cv-card cv-card--span-full">
         <h4>Press</h4>
-        <ul>
-          <li>2026 The Korea Times — <a href="https://www.koreatimes.co.kr/lifestyle/arts-theater/20260124/korean-artists-curators-expand-footprint-at-singapore-art-week-2026?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGnwsBpDsWWf9gVOuhSRU_DiyI5vSUzIlYSxNQ6uvQMyShwZOan2GG6gEELh7U_aem_Lba-RGRd0VIYYpWi3vF5QQ" target="_blank" rel="noopener noreferrer"><em>Korean artists, curators expand footprint at Singapore Art Week 2026</em></a></li>
-          <li>2024 Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer"><em>Wild Women</em></a></li>
-          <li>2023 Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer"><em>Wonhee Delgado embodies the delights of making art dynamic</em></a></li>
-          <li>2023 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer"><em>León Gallery presents Whee's solo exhibition, showcasing fantasy as a journey to the self</em></a></li>
-          <li>2023 Art Plus — <a href="https://artplus.ph/features/fantasy-and-fusion?format=amp" target="_blank" rel="noopener noreferrer"><em>Fantasy and Fusion</em></a></li>
-          <li>2023 Philstar Life — <a href="https://philstarlife.com/geeky/219297-whee-cha-delgado-vibrant-art?page=3" target="_blank" rel="noopener noreferrer"><em>Whee Cha Delgado's vibrant art</em></a></li>
-          <li>2022 Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/making-a-statement-wonhee-delgado" target="_blank" rel="noopener noreferrer"><em>South Korean painter Wonhee Delgado finds her home amid the Manila art scene</em></a></li>
-          <li>2021 Philstar Life — <a href="https://www.philstar.com/lifestyle/fashion-and-beauty/2021/06/30/2108964/art-detour-leon-gallery" target="_blank" rel="noopener noreferrer"><em>'Art Detour' at Leon Gallery</em></a></li>
+        <ul class="cv-list">
+          <li class="cv-year-group">
+            <span class="cv-year">2026</span>
+            <ul class="cv-year-items">
+              <li>The Korea Times — <a href="https://www.koreatimes.co.kr/lifestyle/arts-theater/20260124/korean-artists-curators-expand-footprint-at-singapore-art-week-2026?utm_source=ig&amp;utm_medium=social&amp;utm_content=link_in_bio&amp;fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGnwsBpDsWWf9gVOuhSRU_DiyI5vSUzIlYSxNQ6uvQMyShwZOan2GG6gEELh7U_aem_Lba-RGRd0VIYYpWi3vF5QQ" target="_blank" rel="noopener noreferrer"><em>Korean artists, curators expand footprint at Singapore Art Week 2026</em></a></li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2024</span>
+            <ul class="cv-year-items">
+              <li>Philstar Life — <a href="https://philstarlife.com/geeky/174255-wild-women-abstractionists-nature?page=7%23" target="_blank" rel="noopener noreferrer"><em>Wild Women</em></a></li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2023</span>
+            <ul class="cv-year-items">
+              <li>Lifestyle Inquirer — <a href="https://lifestyle.inquirer.net/484330/wonhee-delgado-embodies-the-delights-of-making-art-dynamic/" target="_blank" rel="noopener noreferrer"><em>Wonhee Delgado embodies the delights of making art dynamic</em></a></li>
+              <li>Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/wonhee-whee-cha-delgado-solo-exhibition-2023" target="_blank" rel="noopener noreferrer"><em>León Gallery presents Whee's solo exhibition, showcasing fantasy as a journey to the self</em></a></li>
+              <li>Art Plus — <a href="https://artplus.ph/features/fantasy-and-fusion?format=amp" target="_blank" rel="noopener noreferrer"><em>Fantasy and Fusion</em></a></li>
+              <li>Philstar Life — <a href="https://philstarlife.com/geeky/219297-whee-cha-delgado-vibrant-art?page=3" target="_blank" rel="noopener noreferrer"><em>Whee Cha Delgado's vibrant art</em></a></li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2022</span>
+            <ul class="cv-year-items">
+              <li>Tatler Asia — <a href="https://www.tatlerasia.com/lifestyle/arts/making-a-statement-wonhee-delgado" target="_blank" rel="noopener noreferrer"><em>South Korean painter Wonhee Delgado finds her home amid the Manila art scene</em></a></li>
+            </ul>
+          </li>
+          <li class="cv-year-group">
+            <span class="cv-year">2021</span>
+            <ul class="cv-year-items">
+              <li>Philstar Life — <a href="https://www.philstar.com/lifestyle/fashion-and-beauty/2021/06/30/2108964/art-detour-leon-gallery" target="_blank" rel="noopener noreferrer"><em>'Art Detour' at Leon Gallery</em></a></li>
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
