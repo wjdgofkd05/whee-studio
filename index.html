@@ -430,13 +430,19 @@
 
     /* 작품 라이트박스 (시안 1과 동일 패턴) */
     .lightbox {
+      --lb-edge-y: clamp(1.25rem, 3vh, 2rem);
+      --lb-side: clamp(1rem, 2.5vw, 1.5rem);
+      --lb-btn: 52px;
+      --lb-arrow-gap: clamp(0.85rem, 2.5vw, 1.5rem);
+      --lb-nav-inset: calc(var(--lb-side) + var(--lb-btn) + var(--lb-arrow-gap));
+      --lb-caption-block: clamp(4.5rem, 10vh, 6rem);
       position: fixed;
       inset: 0;
       z-index: 300;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4rem 0;
+      padding: var(--lb-edge-y) var(--lb-side);
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.22s ease, visibility 0.22s ease;
@@ -461,9 +467,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: min(calc(100vw - 8rem), 1280px);
-      max-height: calc(100dvh - 8rem);
-      gap: 1.25rem;
+      width: min(calc(100vw - 2 * var(--lb-nav-inset)), calc(100vw - 2.5rem), 1680px);
+      max-height: calc(100dvh - 2 * var(--lb-edge-y));
+      gap: 0.75rem;
       pointer-events: none;
       opacity: 1;
       transition: opacity 0.32s ease;
@@ -477,22 +483,29 @@
     }
     .lightbox__img {
       pointer-events: auto;
-      max-width: 100%;
-      max-height: calc(100dvh - 14rem);
       width: auto;
       height: auto;
+      max-width: 100%;
+      max-height: min(
+        calc(100dvh - 2 * var(--lb-edge-y) - var(--lb-caption-block)),
+        calc(100dvh - 6rem)
+      );
       object-fit: contain;
       object-position: center;
       image-rendering: auto;
-      flex: 0 1 auto;
+      flex: 1 1 auto;
       min-height: 0;
+      min-width: 0;
     }
     .lightbox__grid {
       pointer-events: auto;
       flex: 1 1 auto;
       width: 100%;
       min-height: 0;
-      max-height: calc(100dvh - 14rem);
+      max-height: min(
+        calc(100dvh - 2 * var(--lb-edge-y) - var(--lb-caption-block)),
+        calc(100dvh - 6rem)
+      );
     }
     .lightbox__caption {
       margin-top: 0;
@@ -519,8 +532,8 @@
       position: absolute;
       z-index: 2;
       top: 50%;
-      width: 52px;
-      height: 52px;
+      width: var(--lb-btn);
+      height: var(--lb-btn);
       padding: 0;
       border: none;
       border-radius: 999px;
@@ -564,11 +577,11 @@
       transform: translateY(-50%) scale(0.94);
     }
     .lightbox__prev {
-      left: max(1.25rem, env(safe-area-inset-left));
+      left: max(var(--lb-side), env(safe-area-inset-left));
       transform: translateY(-50%);
     }
     .lightbox__next {
-      right: max(1.25rem, env(safe-area-inset-right));
+      right: max(var(--lb-side), env(safe-area-inset-right));
       transform: translateY(-50%);
     }
     .lightbox__prev:hover { transform: translate(-3px, -50%); }
@@ -586,37 +599,54 @@
       visibility: hidden;
       pointer-events: none;
     }
+    @media (max-width: 900px) {
+      .lightbox {
+        --lb-arrow-gap: clamp(1.1rem, 4vw, 1.75rem);
+      }
+    }
     @media (max-width: 640px) {
       .lightbox {
-        padding: 3.5rem 0;
+        --lb-btn: 44px;
+        --lb-side: 0.75rem;
+        --lb-arrow-gap: clamp(1.25rem, 6vw, 2rem);
+        --lb-caption-block: clamp(3.75rem, 12vh, 5rem);
+        padding: clamp(1rem, 2.5vh, 1.5rem) var(--lb-side);
       }
       .lightbox__inner {
-        width: min(calc(100vw - 5.5rem), 1280px);
-        max-height: calc(100dvh - 7rem);
+        width: min(calc(100vw - 2 * var(--lb-nav-inset)), calc(100vw - 1.5rem));
+        max-height: calc(100dvh - 2 * var(--lb-edge-y));
       }
       .lightbox__img,
       .lightbox__grid {
-        max-height: calc(100dvh - 12rem);
-      }
-      .lightbox__btn {
-        width: 44px;
-        height: 44px;
+        max-height: min(
+          calc(100dvh - 2 * var(--lb-edge-y) - var(--lb-caption-block)),
+          calc(100dvh - 5rem)
+        );
       }
       .lightbox__btn svg {
         width: 20px;
         height: 20px;
       }
-      .lightbox__prev { left: max(0.5rem, env(safe-area-inset-left)); }
-      .lightbox__next { right: max(0.5rem, env(safe-area-inset-right)); }
+      .lightbox__prev { left: max(0.75rem, env(safe-area-inset-left)); }
+      .lightbox__next { right: max(0.75rem, env(safe-area-inset-right)); }
       .lightbox__prev:hover { transform: translate(-2px, -50%); }
       .lightbox__next:hover { transform: translate(2px, -50%); }
     }
+    /* 갤러리: 프레임 너비에 맞춰 가로 100% (object-fit 없음 → 좌우 빈 띠 방지) */
     figure.mag .frame {
       background: transparent;
       width: 100%;
+      display: block;
+      line-height: 0;
     }
-    /* 회화·사진: contain + auto (cover·-webkit-optimize-contrast는 크롭/밴딩 유발) */
-    figure.mag .frame img,
+    figure.mag .frame img {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0;
+      image-rendering: auto;
+    }
     .lightbox__img,
     .lightbox__grid img,
     .sketch-slide img,
@@ -625,15 +655,29 @@
       object-position: center;
       image-rendering: auto;
     }
-    figure.mag .frame img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    figure.mag .frame img[data-media-capped] {
-      width: auto;
-      max-width: 100%;
-      margin-inline: auto;
+    /* 1열(모바일·좁은 화면): 챕터 바깥 여백 유지, 콘텐츠 열 안에서 이미지 full width */
+    @media (max-width: 799px) {
+      .chapter[id^="y"] > div:not(.chapter__year-rail),
+      .chapter[id^="y"] .mag-grid {
+        width: 100%;
+        min-width: 0;
+      }
+      .chapter[id^="y"] figure.mag,
+      .chapter[id^="y"] figure.mag .frame {
+        width: 100%;
+        max-width: 100%;
+      }
+      .chapter[id^="y"] figure.mag.span2 .frame {
+        max-width: 100%;
+        margin-inline: 0;
+      }
+      .chapter[id^="y"] figure.mag .frame img {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0;
+        margin: 0 !important;
+        height: auto !important;
+      }
     }
 
     figure.mag.span2 {
@@ -1010,7 +1054,7 @@
           <figcaption>
             <span class="title">Summer 2024</span>
             <span class="meta-line">Charcoal, pastel and oil on canvas</span>
-            <span class="meta-line">130.3 × 162.2 cm</span>
+            <span class="meta-line">162.2 × 130.3 cm</span>
             <span class="meta-line">2026</span>
           </figcaption>
         </figure>
@@ -1046,7 +1090,7 @@
           <figcaption>
             <span class="title">Study of Silent Scream VII</span>
             <span class="meta-line">Pastel and oil crayon on canvas</span>
-            <span class="meta-line">50 × 43 cm</span>
+            <span class="meta-line">43 × 50 cm</span>
             <span class="meta-line">2026</span>
           </figcaption>
         </figure>
@@ -1164,7 +1208,7 @@
           <figcaption>
             <span class="title">Summer 2024</span>
             <span class="meta-line">Charcoal, soft pastel, and oil paint on canvas</span>
-            <span class="meta-line">75.4 × 93 cm</span>
+            <span class="meta-line">93 × 75.4 cm</span>
             <span class="meta-line">2025</span>
           </figcaption>
         </figure>
@@ -1490,7 +1534,7 @@
           <figcaption>
             <span class="title">Garden of Edan</span>
             <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">260 × 163 cm</span>
+            <span class="meta-line">163 × 260 cm</span>
             <span class="meta-line">2019</span>
           </figcaption>
         </figure>
@@ -1499,7 +1543,7 @@
           <figcaption>
             <span class="title">Magic Castle</span>
             <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">260 × 163 cm</span>
+            <span class="meta-line">163 × 260 cm</span>
             <span class="meta-line">2019</span>
           </figcaption>
         </figure>
@@ -1518,7 +1562,7 @@
           <figcaption>
             <span class="title">Untitled</span>
             <span class="meta-line">Oil on canvas</span>
-            <span class="meta-line">129 × 161 cm</span>
+            <span class="meta-line">161 × 129 cm</span>
             <span class="meta-line">2018</span>
           </figcaption>
         </figure>
@@ -1573,7 +1617,7 @@
           <section class="note-block" aria-label="작가 노트">
             <p>나는 자연을 단순한 풍경이 아니라, 감정이 축적되고 분출되는 하나의 생명체로 바라본다.</p>
             <p>나의 작업은 억압된 감정이 내부에서 어떻게 뒤틀리고, 결국 자연의 형태로 번져나가는지를 탐구한다.</p>
-            <p>특히 여성으로서 경험하는 보이지 않는 압력과 사회적 구조 속의 긴장은<br />화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
+            <p>특히 여성으로서 경험과 보이지 않는 압력과 사회적 구조 속의 긴장은 화면 위에서 색과 움직임, 밀도와 균열로 나타난다.</p>
             <p>나는 통제되지 않는 붓질과 겹겹이 쌓이는 색을 통해<br />감정이 사라지는 것이 아니라, 다른 형태로 변형되어 살아남는 과정을 그린다.</p>
             <p>나의 회화는 풍경이 아니라,<br />감정이 스스로 증식하며 만들어낸 하나의 “내면의 자연”이다.</p>
           </section>
@@ -1990,49 +2034,40 @@
         });
       });
 
-      /* 원본 비율 유지 · 레티나에서 CSS 업스케일 방지 + intrinsic 힌트 */
+      /* 갤러리: CSS width 100%. 라이트박스·스케치·노트만 intrinsic 힌트 */
       (function initMediaImages() {
         var MEDIA_IMG =
-          "figure.mag .frame img, .lightbox__img, .lightbox__grid img, .sketch-slide img, .chapter--note .note-photo img";
+          "figure.mag .frame img, .sketch-slide img, .chapter--note .note-photo img";
 
-        function slotWidth(img) {
-          var frame = img.closest(".frame");
-          if (frame && frame.clientWidth) return frame.clientWidth;
-          if (img.classList.contains("lightbox__img")) {
-            var inner = img.closest(".lightbox__inner");
-            if (inner && inner.clientWidth) return inner.clientWidth;
-          }
-          var fig = img.closest("figure");
-          if (fig && fig.clientWidth) return fig.clientWidth;
-          var parent = img.parentElement;
-          return parent ? parent.clientWidth : 0;
+        function clearMediaInline(img) {
+          img.style.width = "";
+          img.style.maxWidth = "";
+          img.style.height = "";
+          img.style.marginLeft = "";
+          img.style.marginRight = "";
+          img.removeAttribute("data-media-capped");
         }
 
         function tuneMediaImg(img) {
           if (!img.naturalWidth) return;
+          if (img.closest("#lightbox")) {
+            clearMediaInline(img);
+            return;
+          }
+          /* 갤러리: 인라인 캡 금지 — 항상 프레임 가로 100% (모바일 빈 여백 원인) */
+          if (img.closest("figure.mag")) {
+            clearMediaInline(img);
+            if (!img.getAttribute("width")) {
+              img.setAttribute("width", String(img.naturalWidth));
+              img.setAttribute("height", String(img.naturalHeight));
+            }
+            return;
+          }
           if (!img.getAttribute("width")) {
             img.setAttribute("width", String(img.naturalWidth));
             img.setAttribute("height", String(img.naturalHeight));
           }
-          var dpr = Math.min(window.devicePixelRatio || 1, 3);
-          var cap = img.naturalWidth / dpr;
-          var slotW = slotWidth(img);
-          if (!slotW) return;
-          if (slotW > cap + 0.5) {
-            img.style.width = "auto";
-            img.style.maxWidth = Math.round(cap) + "px";
-            img.style.height = "auto";
-            img.style.marginLeft = "auto";
-            img.style.marginRight = "auto";
-            img.setAttribute("data-media-capped", "");
-          } else {
-            img.style.width = "";
-            img.style.maxWidth = "";
-            img.style.height = "";
-            img.style.marginLeft = "";
-            img.style.marginRight = "";
-            img.removeAttribute("data-media-capped");
-          }
+          clearMediaInline(img);
         }
 
         function bindMediaImg(img) {
