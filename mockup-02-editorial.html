@@ -442,7 +442,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: var(--lb-edge-y) var(--lb-side);
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.22s ease, visibility 0.22s ease;
@@ -452,8 +459,13 @@
       visibility: visible;
     }
     .lightbox__backdrop {
-      position: absolute;
+      position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
       background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -468,7 +480,12 @@
       align-items: center;
       justify-content: center;
       width: min(calc(100vw - 2 * var(--lb-nav-inset)), calc(100vw - 2.5rem), 1680px);
-      max-height: calc(100dvh - 2 * var(--lb-edge-y));
+      max-height: 100%;
+      height: 100%;
+      padding: max(var(--lb-edge-y), env(safe-area-inset-top))
+        max(var(--lb-side), env(safe-area-inset-right))
+        max(var(--lb-edge-y), env(safe-area-inset-bottom))
+        max(var(--lb-side), env(safe-area-inset-left));
       gap: 0.75rem;
       pointer-events: none;
       opacity: 1;
@@ -592,8 +609,10 @@
       height: 22px;
       stroke-width: 1.5;
     }
+    html.lightbox-open,
     body.lightbox-open {
       overflow: hidden;
+      overscroll-behavior: none;
     }
     body.lightbox-open .topbar {
       visibility: hidden;
@@ -610,11 +629,10 @@
         --lb-side: 0.75rem;
         --lb-arrow-gap: clamp(1.25rem, 6vw, 2rem);
         --lb-caption-block: clamp(3.75rem, 12vh, 5rem);
-        padding: clamp(1rem, 2.5vh, 1.5rem) var(--lb-side);
+        --lb-edge-y: clamp(1rem, 2.5vh, 1.5rem);
       }
       .lightbox__inner {
         width: min(calc(100vw - 2 * var(--lb-nav-inset)), calc(100vw - 1.5rem));
-        max-height: calc(100dvh - 2 * var(--lb-edge-y));
       }
       .lightbox__img,
       .lightbox__grid {
@@ -1069,11 +1087,20 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20116.7%20x%2091%20cm.png" alt="Autumn 2025" loading="lazy" /></div>
+          <div class="frame"><img data-src-hd="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20116.7%20x%2091%20cm.jpg?v=5" src="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20paint%20on%20canvas%20116.7%20x%2091%20cm.png?v=5" alt="Autumn 2025" loading="lazy" /></div>
           <figcaption>
             <span class="title">Autumn 2025</span>
             <span class="meta-line">Charcoal, pastel and oil paint on canvas</span>
             <span class="meta-line">116.7 × 91 cm</span>
+            <span class="meta-line">2026</span>
+          </figcaption>
+        </figure>
+        <figure class="mag square">
+          <div class="frame"><img data-src-hd="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20on%20canvas%20100%20x%20100%20cm.jpg?v=5" src="assets/Autumn%202025%202026%20Charcoal%20pastel%20and%20oil%20on%20canvas%20100%20x%20100%20cm.png?v=5" alt="Autumn 2025" loading="lazy" /></div>
+          <figcaption>
+            <span class="title">Autumn 2025</span>
+            <span class="meta-line">Charcoal, pastel and oil on canvas</span>
+            <span class="meta-line">100 × 100 cm</span>
             <span class="meta-line">2026</span>
           </figcaption>
         </figure>
@@ -1223,7 +1250,7 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.png?v=4" alt="Silent Scream VI" loading="lazy" /></div>
+          <div class="frame"><img data-src-hd="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.jpg?v=5" src="assets/Silent%20Scream%20VI%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20193.04%20x%20156.8%20cm.png?v=5" alt="Silent Scream VI" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream VI</span>
             <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
@@ -1232,7 +1259,7 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png?v=3" alt="Silent Scream IV" loading="lazy" /></div>
+          <div class="frame"><img data-src-hd="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.jpg?v=5" src="assets/Silent%20Scream%20IV%20%202025%20Charcoal%2C%20soft%20pastel%2C%20oil%20pastel%2C%20oil%20stick%20and%20oil%20paint%20on%20canvas%20196%20x%20140%20cm.png?v=5" alt="Silent Scream IV" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream IV</span>
             <span class="meta-line">Charcoal, soft pastel, oil pastel, oil stick and oil paint on canvas</span>
@@ -1241,7 +1268,7 @@
           </figcaption>
         </figure>
         <figure class="mag landscape">
-          <div class="frame"><img src="assets/Silent%20Scream%20V%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20194%20x%20153.3%20cm.png?v=3" alt="Silent Scream V" loading="lazy" /></div>
+          <div class="frame"><img data-src-hd="assets/Silent%20Scream%20V%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20194%20x%20153.3%20cm.jpg?v=5" src="assets/Silent%20Scream%20V%202025%20Charcoal%2C%20soft%20pastel%20and%20oil%20paint%20on%20canvas%20194%20x%20153.3%20cm.png?v=5" alt="Silent Scream V" loading="lazy" /></div>
           <figcaption>
             <span class="title">Silent Scream V</span>
             <span class="meta-line">Charcoal, soft pastel and oil paint on canvas</span>
@@ -2145,6 +2172,46 @@
         var lbInner = lb.querySelector(".lightbox__inner");
         var lbPrev = lb.querySelector(".lightbox__prev");
         var lbNext = lb.querySelector(".lightbox__next");
+        var lbLockedScrollY = 0;
+
+        function lockLightboxPageScroll() {
+          lbLockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+          document.documentElement.classList.add("lightbox-open");
+          document.body.style.position = "fixed";
+          document.body.style.top = "-" + lbLockedScrollY + "px";
+          document.body.style.left = "0";
+          document.body.style.right = "0";
+          document.body.style.width = "100%";
+        }
+
+        function unlockLightboxPageScroll() {
+          var y = lbLockedScrollY;
+          document.body.style.position = "";
+          document.body.style.top = "";
+          document.body.style.left = "";
+          document.body.style.right = "";
+          document.body.style.width = "";
+          document.documentElement.classList.remove("lightbox-open");
+          window.scrollTo(0, y);
+        }
+
+        function syncLightboxViewport() {
+          if (!lb.classList.contains("is-open")) return;
+          var vv = window.visualViewport;
+          if (!vv) {
+            lb.style.height = "";
+            lb.style.top = "";
+            return;
+          }
+          lb.style.height = Math.ceil(vv.height) + "px";
+          lb.style.top = Math.ceil(vv.offsetTop) + "px";
+        }
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", syncLightboxViewport);
+          window.visualViewport.addEventListener("scroll", syncLightboxViewport);
+        }
+
         var cards = Array.prototype.slice
           .call(document.querySelectorAll(".layout__main figure.mag"))
           .filter(function (fig) {
@@ -2281,6 +2348,8 @@
           lb.hidden = false;
           lb.classList.add("is-open");
           document.body.classList.add("lightbox-open");
+          lockLightboxPageScroll();
+          syncLightboxViewport();
           lb.focus({ preventScroll: true });
         }
 
@@ -2288,6 +2357,9 @@
           lbNavGen += 1;
           lb.classList.remove("is-open");
           document.body.classList.remove("lightbox-open");
+          unlockLightboxPageScroll();
+          lb.style.height = "";
+          lb.style.top = "";
           lb.hidden = true;
           lbImg.removeAttribute("src");
           lbImg.style.opacity = "";
