@@ -17,6 +17,8 @@
   <meta name="twitter:title" content="Whee" />
   <meta name="twitter:description" content="Paintings and works. Seoul and Manila." />
   <meta name="twitter:image" content="https://whee-studio.vercel.app/assets/og.png" />
+  <link rel="icon" type="image/png" href="/assets/og.png" />
+  <link rel="apple-touch-icon" href="/assets/og.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -652,18 +654,61 @@
     }
     /* 갤러리: 프레임 너비에 맞춰 가로 100% (object-fit 없음 → 좌우 빈 띠 방지) */
     figure.mag .frame {
-      background: transparent;
+      background: #f2f2f4;
       width: 100%;
       display: block;
       line-height: 0;
+      position: relative;
+      overflow: hidden;
     }
-    figure.mag .frame img {
+    figure.mag.portrait .frame { aspect-ratio: 3 / 4; }
+    figure.mag.landscape .frame { aspect-ratio: 4 / 3; }
+    figure.mag.square .frame { aspect-ratio: 1 / 1; }
+    /* 로드 전에는 자리 유지, 로드 후에는 실제 이미지 비율로 복귀 */
+    figure.mag .frame.is-loaded {
+      aspect-ratio: auto;
+      background: transparent;
+    }
+    figure.mag .frame:not(.sketch-frame)::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, #ececf0 8%, #f9f9fb 18%, #ececf0 33%);
+      background-size: 220% 100%;
+      animation: skeleton-shimmer 1.25s ease-in-out infinite;
+      z-index: 0;
+      transition: opacity 0.25s ease;
+    }
+    figure.mag .frame.is-loaded::before {
+      opacity: 0;
+      pointer-events: none;
+    }
+    figure.mag .frame > img {
       width: 100%;
       max-width: 100%;
       height: auto;
       display: block;
       margin: 0;
       image-rendering: auto;
+      opacity: 0;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.22s ease;
+    }
+    figure.mag .frame.is-loaded > img {
+      opacity: 1;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      figure.mag .frame:not(.sketch-frame)::before {
+        animation: none;
+      }
+      figure.mag .frame > img {
+        transition: none;
+      }
     }
     .lightbox__img,
     .lightbox__grid img,
@@ -1974,9 +2019,32 @@
           setMobileNavOpen(!topbarEl.classList.contains("is-nav-open"));
         });
 
-        siteNav.querySelectorAll("a").forEach(function (link) {
-          link.addEventListener("click", function () {
+        function scrollToAnchor(id) {
+          var target = document.getElementById(id);
+          if (!target) return;
+          var headerBottom = topbarEl.getBoundingClientRect().bottom;
+          var targetTop = target.getBoundingClientRect().top + window.scrollY;
+          var y = Math.max(0, targetTop - headerBottom - 8);
+          window.scrollTo({ top: y, behavior: "smooth" });
+          if (history && typeof history.replaceState === "function") {
+            history.replaceState(null, "", "#" + id);
+          } else {
+            location.hash = id;
+          }
+        }
+
+        siteNav.querySelectorAll('a[href^="#"]').forEach(function (link) {
+          link.addEventListener("click", function (e) {
+            var href = link.getAttribute("href") || "";
+            var id = href.slice(1);
+            if (!id) return;
+            e.preventDefault();
             if (mqMobile.matches) setMobileNavOpen(false);
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                scrollToAnchor(id);
+              });
+            });
           });
         });
 
@@ -2098,10 +2166,17 @@
         }
 
         function bindMediaImg(img) {
+          function markLoaded() {
+            var frame = img.closest("figure.mag .frame");
+            if (frame && !frame.classList.contains("sketch-frame")) {
+              frame.classList.add("is-loaded");
+            }
+          }
           function run() {
             tuneMediaImg(img);
+            markLoaded();
           }
-          if (img.complete) run();
+          if (img.complete && img.naturalWidth) run();
           else img.addEventListener("load", run, { once: true });
         }
 
