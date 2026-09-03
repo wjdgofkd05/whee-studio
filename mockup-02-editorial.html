@@ -996,11 +996,15 @@
     .chapter--note .note-photo {
       margin-bottom: 1.5rem;
       max-width: 100%;
+      aspect-ratio: 986 / 1333;
+      overflow: hidden;
     }
     .chapter--note .note-photo img {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
+      object-fit: cover;
+      object-position: center top;
     }
     .chapter--note .note-layout {
       display: grid;
@@ -1668,7 +1672,7 @@
     <div class="chapter__body">
       <div class="note-layout">
         <div class="note-photo">
-          <img src="assets/Artist%20Note.jpg" alt="Woni Cha in the studio" width="1080" height="1509" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
+          <img src="assets/Artist%20Note.jpg" alt="Woni Cha in the studio" width="1766" height="2474" loading="lazy" data-fallback="https://picsum.photos/seed/wheenote2/900/720" />
         </div>
         <div class="note-text">
           <section class="note-block" aria-label="Artist note">
